@@ -18,6 +18,8 @@ router.get('/search', recipeController.searchRecipes);
 
 router.get('/favorites', authMiddleware,authorizeRoles('Admin','User'), recipeController.getUserFavorites);
 
+router.get('/findRecipe', recipeController.searchRecipeByIngredients);
+
 router.put('/update-image/:id',authMiddleware,authorizeRoles('User','Admin'),dynamicUpload('recipes').single('image'),rateLimiter.generalRateLimiter,recipeController.updateRecipeImage);
 
 router.put('/update/:id', authMiddleware, authorizeRoles('User','Admin'), recipeController.updateRecipe);

@@ -277,6 +277,23 @@ async function getUserFavorites(user_id) {
     }
 };
 
+async function searchRecipeByIngredients(ingredients) {
+    try {
+        const results = await db.query(`
+                    SELECT r.recipe_id, r.title, r.description,r.time,r.diffucilty rg.image_url
+                    FROM recipes r
+                    JOIN recipe_ingredients ri ON r.recipe_id = ri.recipe_id
+                    JOIN ingredients i ON ri.ingredient_id = i.ingredient_id
+                    LEFT JOIN recipe_gallery rg ON r.recipe_id = rg.recipe_id
+                    GROUP BY r.recipe_id, rg.image_url
+                    HAVING EVERY(LOWER(i.ingredient_name) = ANY($1));
+                    `,[ingredients.map((n) => n.toLowerCase())]);
+        return results.rows;
+    } catch (error) {
+        console.error('Error while finding a recipe:',error)      
+    }
+};
+
 
 
 module.exports = {
@@ -297,5 +314,6 @@ module.exports = {
     searchRecipes,
     addFavoriteRecipe,
     removeFavoriteRecipe,
-    getUserFavorites
-}
+    getUserFavorites,
+    searchRecipeByIngredients
+};

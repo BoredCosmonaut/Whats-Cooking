@@ -268,7 +268,24 @@ async function getUserFavorites(req,res) {
     console.error('Error while fetching favorites:', error);
     res.status(500).json({message:'Failed to get favorites'});
   }
-}
+};
+
+async function searchRecipeByIngredients(req,res) {
+  try {
+    const {ingredients} = req.body;
+  
+    if(!ingredients || !Array.isArray(ingredients) || ingredients.length === 0) return res.status(400).json({message:'Please send an array'});
+  
+    const recipes = await recipeModel.searchRecipeByIngredients(ingredients);
+
+    if(recipes.length === 0) res.status(200).json({message:'Failed to find a suitable recipe'});
+    else  res.status(200).json({message:'Recipes you can cook', recipes:recipes});
+  
+  } catch (error) {
+    console.error('Error while getting recipes:',error);
+    res.status(500).json({message:'Error while searching the recipes'});
+  }
+};
 
 module.exports = {
     createRecipe,
@@ -280,5 +297,6 @@ module.exports = {
     searchRecipes,
     addFavoriteRecipe,
     removeFavoriteRecipe,
-    getUserFavorites
+    getUserFavorites,
+    searchRecipeByIngredients
 }

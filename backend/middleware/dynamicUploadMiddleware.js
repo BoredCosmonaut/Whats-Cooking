@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const { type } = require('os');
 
-const ALLOWED_TYPES = ['recipes']
+const ALLOWED_TYPES = ['recipes','profile']
 
 const getStorage = (type) => {
     if (!ALLOWED_TYPES.includes(type)) {

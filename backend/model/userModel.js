@@ -2,26 +2,28 @@ const db = require('../config/db');
 
 
 async function createUser(user) {
-    try {
-        const {username,password,email} = user;
-        const result = await db.query(
-            `INSERT INTO users (username,password,email)
-            VALUES($1,$2,$3) RETURNING *`,
-            [username,password,email]
-        );
-    return result.rows[0];
-    } catch (error) {
-        console.error('Error while creating user:', error);
-    }
-};
+  try {
 
-async function getUserById(id) {
-    try {
-        const result = await db.query(`SELECT * FROM users WHERE id = $1`,[id]);
-        return result.rows[0];
-    } catch (error) {
-        console.error('Error while getting user by id:',error);
-    }
+    const { username, password, email } = user;
+
+    const userResult = await db.query(
+      `INSERT INTO users (username, password, email)
+       VALUES ($1, $2, $3) RETURNING *`,
+      [username, password, email]
+    );
+    const newUser = userResult.rows[0];
+
+    await db.query(
+      `INSERT INTO user_gallery (user_id) VALUES ($1)`,
+      [newUser.user_id] // use the PK from users
+    );
+
+    return newUser;
+
+  } catch (error) {
+    console.error('Error while creating user with gallery:', error);
+    throw error;
+  } 
 }
 
 async function getUserByEmail(email) {
@@ -46,9 +48,42 @@ async function getUserByEmail(email) {
     }
 }
 
+async function getUserInfoById(user_id) {
+    try {
+        const user_info = await db.query(`
+                SELECT u.username,u.email,ug.image_name,ug.image_url 
+                FROM users u LEFT JOIN user_gallery ug 
+                ON  ug.user_id = u.user_id WHERE u.user_id = $1`, [user_id]);
+        
+        return user_info.rows[0];
+
+    } catch (error) {
+        console.error('Error while getting user info:',error);
+    }
+};
+
+async function updateProfilePicture(user_id, image_name, image_url) {
+  try {
+    const result = await db.query(
+      `UPDATE user_gallery
+       SET image_name = $2, image_url = $3
+       WHERE user_id = $1
+       RETURNING *`,
+      [user_id, image_name, image_url]
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    console.error('Error while updating the image:', error);
+    throw error;
+  }
+}
+
+
 
 module.exports = {
     createUser,
     getUserByEmail,
-    getUserById
+    getUserInfoById,
+    updateProfilePicture
 }
