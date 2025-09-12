@@ -12,5 +12,11 @@ router.post('/login', rateLimiter.loginRateLimiter, userController.loginUser);
 
 router.get('/info/:userId',authMiddleware,authorizeRoles('User','Admin'),userController.getUserInfoById);
 
+router.put('/profile/:id',authMiddleware,authorizeRoles('User','Admin'),rateLimiter.generalRateLimiter,userController.updateUserInfo);
+
+router.put('/updatePassword/:id', authMiddleware,authorizeRoles('User','Admin'),rateLimiter.generalRateLimiter,userController.updatePassword);
+
 router.put('/profileImage/update/:userId', authMiddleware,authorizeRoles('User','Admin'),dynamicUpload('profile').single('image'), userController.updateProfilePicture)
+
+
 module.exports = router;

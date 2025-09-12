@@ -92,10 +92,59 @@ async function updateProfilePicture(req,res) {
     }
 };
 
+async function updateUserInfo(req,res) {
+    try {
+        const user_id = parseInt(req.params.id);
+        if(user_id !== req.user.id && req.user.role !== 'Admin') return res.status(403).json({message:'You can only update your own info'});
+
+        const {username,email} = req.body;
+
+        if (!username && !email) return res.status(400).json({message:'Username or email required'})
+
+        const updatedUser = await userModel.updateUserInfo(user_id,username,email);
+
+        res.status(200).json({message:'Updated info fetched', info:updatedUser});
+    } catch (error) {
+        console.error('Error while updating user info:',error);
+        res.status(500).json({message:'Failed update info'});
+    }
+};
+
+async function updatePassword(req,res) {
+    try {
+        const user_id = parseInt(req.params.id);
+
+        if(user_id !== req.user.id && req.user.role !== 'Admin') return res.status(403).json({message:'You can only update your own password'});
+
+        const {current_password,newPassword} = req.body;
+        
+        if(!newPassword) return res.status(400).json({message:'New password needed'});
+
+        const user = await userModel.getUserInfoById(user_id);
+
+        if(!user) return res.status(404).json({message:'User not found'});
+
+        if(req.user.role !== 'Admin') {
+            const isMatch = await bcrypt.compare(current_password,user.password);
+            if(!isMatch) return res.status(400).json({message:'Current password is wrong'});
+        };
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const updatedUser = await userModel.updatePassword(user_id,hashedPassword);
+
+        res.status(200).json({message:'Password updated.'});
+    } catch (error) {
+        console.error('Error while updating passwrod:',error);
+        res.status(500).json({message:'Failed to update password'});
+    }
+};
+
 
 module.exports = {
     registerUser,
     loginUser,
     getUserInfoById,
-    updateProfilePicture
+    updateProfilePicture,
+    updateUserInfo,
+    updatePassword
 }

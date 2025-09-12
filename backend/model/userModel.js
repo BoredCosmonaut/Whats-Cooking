@@ -51,7 +51,7 @@ async function getUserByEmail(email) {
 async function getUserInfoById(user_id) {
     try {
         const user_info = await db.query(`
-                SELECT u.username,u.email,ug.image_name,ug.image_url 
+                SELECT u.username,u.email,u.password,ug.image_name,ug.image_url 
                 FROM users u LEFT JOIN user_gallery ug 
                 ON  ug.user_id = u.user_id WHERE u.user_id = $1`, [user_id]);
         
@@ -79,11 +79,60 @@ async function updateProfilePicture(user_id, image_name, image_url) {
   }
 }
 
+async function updateUserInfo(user_id, username, email) {
+  try {
+
+    const fields = [];
+    const values = [];
+    let id = 1;
+
+    if (username) {
+      fields.push(`username = $${id++}`);
+      values.push(username);
+    }
+    if (email) {
+      fields.push(`email = $${id++}`);
+      values.push(email);
+    }
+
+    if (fields.length === 0) return null;
+
+    values.push(user_id);
+
+    const result = await db.query(
+      `UPDATE users 
+       SET ${fields.join(', ')} 
+       WHERE user_id = $${id} 
+       RETURNING *`,
+      values
+    );
+
+    return result.rows[0];
+  } catch (error) {
+    console.error('Error while updating profile info:', error);
+    throw error;
+  }
+}
+
+
+async function updatePassword(user_id,hashedPassword) {
+  try {
+    const result = await db.query(`
+                UPDATE users
+                SET password = $1 
+                WHERE user_id = $2 `,[hashedPassword,user_id]);
+  } catch (error) {
+    console.error('Error while updating password:',error);
+  }
+};
+
 
 
 module.exports = {
     createUser,
     getUserByEmail,
     getUserInfoById,
-    updateProfilePicture
+    updateProfilePicture,
+    updateUserInfo,
+    updatePassword
 }
