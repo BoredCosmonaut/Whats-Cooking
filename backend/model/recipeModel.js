@@ -84,6 +84,7 @@ async function getRecipeInfoById(id) {
                             SELECT 
                                 r.*,
                                 u.username AS submitted_by_username,
+                                r.submitted_by,
                                 ri.image_name,
                                 (
                                 SELECT json_agg(jsonb_build_object(

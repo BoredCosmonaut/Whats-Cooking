@@ -10,6 +10,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 const userRoutes = require('./routes/userRoutes');
 const recipeRoutes = require('./routes/recipeRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+
 app.use(cors({
   origin: (origin, callback) => {
     callback(null, true);
@@ -24,7 +26,7 @@ app.use('/images', express.static(path.join(__dirname, '..', 'images')));
 
 app.use('/api/users', userRoutes);
 app.use('/api/recipes', recipeRoutes);
-
+app.use('/api/reviews',reviewRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

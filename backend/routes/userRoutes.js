@@ -10,7 +10,11 @@ router.post('/register', rateLimiter.registerUserLimiter,userController.register
 
 router.post('/login', rateLimiter.loginRateLimiter, userController.loginUser);
 
+router.post('/:id/points/adjust', authMiddleware,authorizeRoles('Admin'),userController.adjustUserPoints);
+
 router.get('/info/:userId',authMiddleware,authorizeRoles('User','Admin'),userController.getUserInfoById);
+
+router.get('/:id/points',userController.getUserPoınts);
 
 router.put('/profile/:id',authMiddleware,authorizeRoles('User','Admin'),rateLimiter.generalRateLimiter,userController.updateUserInfo);
 

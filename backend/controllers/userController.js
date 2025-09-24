@@ -139,6 +139,38 @@ async function updatePassword(req,res) {
     }
 };
 
+async function getUserPoınts(req,res) {
+    try {
+        const user_id = parseInt(req.params.id);
+
+        const points = await userModel.getPoints(user_id);
+
+        res.status(200).json({message:{message:'Points Fetched:',points}})
+
+    } catch (error) {
+        console.error('Error while getting points:',error)
+        res.status(500).json({message:'Failed to get user points'});
+    }
+};
+
+async function adjustUserPoints(req,res) {
+    try {
+        const user_id = parseInt(req.params.id);
+        const {points_change,action} = req.body;
+        
+        if(req.user.role !== 'Admin') return res.status(201).json({message:'You must be an admin to use this'});
+
+        if(typeof(points_change) !== 'number') return res.status(400).json(({message:'Points must be a numbers'}));
+
+        const updated = await userModel.adjustUserPoints(user_id,points_change,action);
+
+        res.status(200).json({message:'Points adjusted:',updated});
+    } catch (error) {
+        console.error('Error while adjusting points:',error);
+        res.status(500).json({message:'Failed to adjust points'});
+    }
+};
+
 
 module.exports = {
     registerUser,
@@ -146,5 +178,7 @@ module.exports = {
     getUserInfoById,
     updateProfilePicture,
     updateUserInfo,
-    updatePassword
+    updatePassword,
+    getUserPoınts,
+    adjustUserPoints
 }

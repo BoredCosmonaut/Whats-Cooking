@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const fsPromises = require('fs').promises;
 const recipeModel = require('../model/recipeModel');
+const userModel = require('../model/userModel');
 const { error } = require('console');
 
 async function createRecipe(req, res) {
@@ -57,8 +58,11 @@ async function createRecipe(req, res) {
       }
     }
 
+    const awarded_points = 10;
+    await userModel.updatePoints(submitted_by,"post_recipe",awarded_points);
+
     res.status(201).json({
-      message: "Recipe created successfully",
+      message: `Recipe created successfully. You earned ${awarded_points} points!`,
       recipe: newRecipe,
       image: recipe_image,
     });

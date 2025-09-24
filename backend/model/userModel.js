@@ -126,6 +126,40 @@ async function updatePassword(user_id,hashedPassword) {
   }
 };
 
+async function updatePoints(user_id,action,pointsChange) {
+  try {
+    
+    await db.query(`INSERT INTO user_points (user_id,action,points_change) VALUES ($1,$2,$3)`, [user_id,action,pointsChange]);
+
+    const result = await db.query(`UPDATE users SET points = points + $1 WHERE user_id = $2 RETURNING points`,[pointsChange,user_id]);
+
+    return result.rows[0];
+
+  } catch (error) {
+    console.error('Error while updating points:',error);
+  }
+};
+
+async function getPoints(user_id) {
+  try {
+    const result = await db.query('SELECT points FROM users WHERE user_id = $1', [user_id]);
+
+    const history = await db.query('SELECT action,points_change,created_at FROM user_points WHERE user_id = $1 ORDER BY created_at DESC', [user_id]);
+
+    return {
+      total: result.rows[0]?.points || 0,
+      history:history.rows
+    };
+
+  } catch (error) {
+    console.error('Error while getting point data:',error);
+  }
+};
+
+async function adjustUserPoints(user_id,points_change,action) {
+  return updatePoints(user_id,action,points_change);
+};
+
 
 
 module.exports = {
@@ -134,5 +168,8 @@ module.exports = {
     getUserInfoById,
     updateProfilePicture,
     updateUserInfo,
-    updatePassword
+    updatePassword,
+    updatePoints,
+    getPoints,
+    adjustUserPoints
 }
