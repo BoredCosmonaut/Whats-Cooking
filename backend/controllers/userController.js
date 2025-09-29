@@ -52,8 +52,8 @@ async function getUserInfoById(req,res) {
         if(!user_id) return res.status(401).json(({message:'User cant be found'}));
 
         const result = await userModel.getUserInfoById(user_id);
-
-        res.status(201).json({message:'User info fetched', info:result});
+        const points = await userModel.getPoints(user_id);
+        res.status(201).json({message:'User info fetched', info:result,points:points.total});
 
     } catch (error) {
         console.error('Error while getting user info:',error);

@@ -13,13 +13,11 @@ const recipeRoutes = require('./routes/recipeRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 
 app.use(cors({
-  origin: (origin, callback) => {
-    callback(null, true);
-  },
-  methods: "GET,POST,PUT,DELETE,OPTIONS",
-  allowedHeaders: "Content-Type,Authorization",
-  credentials: false
+    origin: 'http://localhost:8082',
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 
 
 app.use('/images', express.static(path.join(__dirname, '..', 'images')));
