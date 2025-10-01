@@ -172,6 +172,17 @@ async function adjustUserPoints(req,res) {
 };
 
 
+async function getTopChefs(req,res) {
+    try {
+        const chefs = await userModel.getTopChefs();
+        res.status(200).json({message:'Chefs fetched', chefs:chefs})
+    } catch (error) {
+        console.error('Error while fetching chefs:', error)
+        res.status(500).json({message:'Couldnt fetch top chefs'});
+    }
+}
+
+
 module.exports = {
     registerUser,
     loginUser,
@@ -180,5 +191,6 @@ module.exports = {
     updateUserInfo,
     updatePassword,
     getUserPoınts,
-    adjustUserPoints
+    adjustUserPoints,
+    getTopChefs
 }

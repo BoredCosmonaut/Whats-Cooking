@@ -12,6 +12,8 @@ router.post('/login', rateLimiter.loginRateLimiter, userController.loginUser);
 
 router.post('/:id/points/adjust', authMiddleware,authorizeRoles('Admin'),userController.adjustUserPoints);
 
+router.get('/top',userController.getTopChefs);
+
 router.get('/info/:userId',authMiddleware,authorizeRoles('User','Admin'),userController.getUserInfoById);
 
 router.get('/:id/points',userController.getUserPoınts);

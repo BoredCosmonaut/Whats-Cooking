@@ -291,6 +291,19 @@ async function searchRecipeByIngredients(req,res) {
   }
 };
 
+async function getUserRecipes(req,res) {
+  try {
+    const user_id = req.params.id
+    if(!user_id) return res.status(400).json({message:'User not found'});
+    const recipes = await recipeModel.getUserRecipes(user_id);
+
+    res.status(200).json({message:'Recipes fetched', recipes:recipes});
+  } catch (error) {
+    console.error('Error while fetching recipes:',error)
+    res.status(500).json({message:'Error while fetching user recipes'});
+  }
+};
+
 module.exports = {
     createRecipe,
     getRecipeInfoById,
@@ -302,5 +315,6 @@ module.exports = {
     addFavoriteRecipe,
     removeFavoriteRecipe,
     getUserFavorites,
-    searchRecipeByIngredients
+    searchRecipeByIngredients,
+    getUserRecipes
 }

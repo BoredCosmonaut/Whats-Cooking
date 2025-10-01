@@ -14,3 +14,8 @@ export async function getUserInfo(userId) {
     const result = await api.get(`/users/info/${userId}`);
     return result.data;
 }
+
+export async function getTopChefs() {
+    const result = await api.get(`/users/top`);
+    return result.data;
+}

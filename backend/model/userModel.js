@@ -160,6 +160,18 @@ async function adjustUserPoints(user_id,points_change,action) {
   return updatePoints(user_id,action,points_change);
 };
 
+async function getTopChefs() {
+  try {
+    const result = await db.query(`
+                SELECT u.username,u.points,u.user_id,ug.image_name 
+                FROM users u 
+                LEFT JOIN user_gallery ug ON ug.user_id = u.user_id ORDER BY u.points DESC LIMIT 5`);
+    return result.rows;
+  } catch (error) {
+    console.error('Error while getting users:',error);
+  }
+}
+
 
 
 module.exports = {
@@ -171,5 +183,6 @@ module.exports = {
     updatePassword,
     updatePoints,
     getPoints,
-    adjustUserPoints
+    adjustUserPoints,
+    getTopChefs,
 }

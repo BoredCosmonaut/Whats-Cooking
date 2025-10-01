@@ -295,6 +295,42 @@ async function searchRecipeByIngredients(ingredients) {
     }
 };
 
+async function getUserRecipes(user_id) {
+    try {
+        const result = await db.query(`                            
+                            SELECT 
+                                r.*,
+                                u.username AS submitted_by_username,
+                                r.submitted_by,
+                                ri.image_name,
+                                (
+                                SELECT json_agg(jsonb_build_object(
+                                    'ingredient_id', i.ingredient_id,
+                                    'name', i.ingredient_name,
+                                    'quantity', riq.quantity
+                                ))
+                                FROM recipe_ingredients riq
+                                JOIN ingredients i ON riq.ingredient_id = i.ingredient_id
+                                WHERE riq.recipe_id = r.recipe_id
+                                ) AS ingredients,
+                                (
+                                SELECT json_agg(jsonb_build_object(
+                                    'step_number', rs.step_number,
+                                    'description', rs.instruction
+                                ) ORDER BY rs.step_number)
+                                FROM recipe_steps rs
+                                WHERE rs.recipe_id = r.recipe_id
+                                ) AS steps
+                            FROM recipes r
+                            LEFT JOIN users u ON r.submitted_by = u.user_id
+                            LEFT JOIN recipe_gallery ri ON r.recipe_id = ri.recipe_id
+                            WHERE r.submitted_by = $1;`,[user_id])
+        return result.rows
+    } catch (error) {
+        console.error('Error while getting recipes for users:',error)
+    }
+};
+
 
 
 module.exports = {
@@ -316,5 +352,6 @@ module.exports = {
     addFavoriteRecipe,
     removeFavoriteRecipe,
     getUserFavorites,
-    searchRecipeByIngredients
+    searchRecipeByIngredients,
+    getUserRecipes
 };

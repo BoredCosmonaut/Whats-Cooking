@@ -11,6 +11,16 @@
                 />
             </div>
         </div>
+        <div class="featured">
+
+            <div class="top">
+                <chefCard 
+                    v-for="chef in chefs"
+                    :key="chef.user_id"
+                    :chef="chef"
+                />
+            </div>
+        </div>
     </div>
 </template>
 
@@ -18,11 +28,14 @@
     import { onMounted } from 'vue';
     import { useRecipe } from '@/composables/useRecipe';
     import RecipeCard from '@/components/recipeCard.vue';
+    import { useUser } from '@/composables/useUsers';
+    import chefCard from '@/components/chefCard.vue';
 
     const {recipes,isLoading:recipesLoading,getAllRecipes} = useRecipe();
-
+    const {chefs,fetchTopUsers} = useUser()
     onMounted( async () => {
         await getAllRecipes();
+        await fetchTopUsers();
     })
 
 </script>

@@ -3,6 +3,7 @@ import LoginView from '@/views/loginView.vue'
 import RegisterView from '@/views/registerView.vue'
 import HomeView from '@/views/homeView.vue'
 import mainLayout from '@/layouts/mainLayout.vue'
+import ProfileView from '@/views/profileView.vue'
 const routes = [
   {
     path:'/login',
@@ -20,7 +21,8 @@ const routes = [
     component:mainLayout,
     children:[
       {path:'', redirect:'/home'},
-      {path:'home',name:'Home', component:HomeView}
+      {path:'home',name:'Home', component:HomeView},
+      {path:'profile/:userId', name:'Profile', component:ProfileView}
     ]
   }
 ]

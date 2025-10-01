@@ -1,10 +1,10 @@
 <template> 
     <main class="recipe-card">
         <img :src="`http://localhost:8080/images/recipes/${recipe.image_name}`" alt="recipe-image" class="recipe-image">
-        <h2 class="recipe-name">{{ recipe.title }}</h2>
-        <p class="submitted-by">{{ recipe.submitted_by_username }}</p>
-        <p class="difficulty">{{ recipe.difficulty }}</p>
-        <p class="category">{{ recipe.category }}</p>
+        <h2 class="recipe-name">Name:{{ recipe.title }}</h2>
+        <p class="submitted-by">Chef {{ recipe.submitted_by_username }}</p>
+        <p class="difficulty">Difficulty:{{ recipe.difficulty }}</p>
+        <p class="category">Category:{{ recipe.category }}</p>
     </main>
 </template>
 

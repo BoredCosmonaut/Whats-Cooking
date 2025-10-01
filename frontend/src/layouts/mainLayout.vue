@@ -21,7 +21,8 @@
                 <p class="points">{{ user.points }}</p>               
             </div>
             <nav class="router-links">
-                
+                <RouterLink :to="`/home`">Home</RouterLink>
+                <RouterLink :to="`/profile/${userId}`">Profile</RouterLink>
             </nav>
         </div>
         <main class="main-view">
