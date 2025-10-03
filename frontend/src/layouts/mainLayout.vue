@@ -3,18 +3,23 @@
     import { onMounted } from 'vue';
     import { useUser } from '@/composables/useUsers';
 
-    const {user,fetchUser} =useUser();
+
+    const {user,restoreUser} =useUser();
     const userId = localStorage.getItem('userId');
 
-    onMounted( async() => {
-        if(userId) await fetchUser(userId);
+    onMounted(async () => {
+      const user_id = localStorage.getItem("userId");
+      if (user_id) {
+        await restoreUser();
+      }
     });
+
 
 </script>
 
 <template> 
     <div class="main-layout">
-        <div class="sidebar" v-if="user">
+        <div class="sidebar" v-if="user && user.info">
             <div class="info">
                 <img :src="`http://localhost:8080/images/profile/${user.info.image_name}`" alt="" class="user-image">
                 <p class="username">{{ user.info.username }}</p>

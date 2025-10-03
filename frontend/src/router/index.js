@@ -19,6 +19,7 @@ const routes = [
     path:'/',
     name:'main',
     component:mainLayout,
+    meta: { requiresAuth: true },
     children:[
       {path:'', redirect:'/home'},
       {path:'home',name:'Home', component:HomeView},
@@ -27,9 +28,23 @@ const routes = [
   }
 ]
 
+
 const router = createRouter({
   history: createWebHistory(),
   routes
-})
+});
+
+router.beforeEach((to, from, next) => {
+  const isAuth = !!localStorage.getItem('token');
+  console.log('Navigating to:', to.fullPath, 'Auth?', isAuth);
+
+  if (to.matched.some(record => record.meta.requiresAuth) && !isAuth) {
+    console.log('Blocked, redirecting to login...');
+    next('/login');
+  } else {
+    next();
+  }
+});
+
 
 export default router

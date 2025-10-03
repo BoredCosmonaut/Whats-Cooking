@@ -2,7 +2,7 @@
 import { defineProps } from 'vue';
 
 defineProps({
-  chef: {
+  harlot: {
     type: Object,
     required: true
   },
@@ -12,14 +12,14 @@ defineProps({
 <template>
   <div class="chef-card">
     <img 
-      v-if="chef.image_name" 
-      :src="`http://localhost:8080/images/profile/${chef.image_name}`" 
+      v-if="harlot.image_name" 
+      :src="`http://localhost:8080/images/profile/${harlot.image_name}`" 
       alt="chef image" 
       class="chef-image"
     />
     <div class="chef-info">
-      <p class="username">{{ chef.username }}</p>
-      <p class="points">{{ chef.points }} pts</p>
+      <p class="username">{{ harlot.username }}</p>
+      <p class="points">{{ harlot.points }} pts</p>
     </div>
   </div>
 </template>

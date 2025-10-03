@@ -14,6 +14,8 @@ router.post('/:id/points/adjust', authMiddleware,authorizeRoles('Admin'),userCon
 
 router.get('/top',userController.getTopChefs);
 
+router.get('/harlots',userController.getHarlots);
+
 router.get('/info/:userId',authMiddleware,authorizeRoles('User','Admin'),userController.getUserInfoById);
 
 router.get('/:id/points',userController.getUserPoınts);

@@ -19,3 +19,8 @@ export async function getTopChefs() {
     const result = await api.get(`/users/top`);
     return result.data;
 }
+
+export async function getHarlots() {
+    const result = await api.get(`/users/harlots`);
+    return result.data;
+}

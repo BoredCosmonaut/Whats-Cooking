@@ -20,6 +20,13 @@
                     :chef="chef"
                 />
             </div>
+            <div class="bottom">
+                <HarlotCard 
+                    v-for="harlot in harlots"
+                    :key="harlot.user_id"
+                    :harlot = "harlot"
+                />
+            </div>
         </div>
     </div>
 </template>
@@ -30,12 +37,14 @@
     import RecipeCard from '@/components/recipeCard.vue';
     import { useUser } from '@/composables/useUsers';
     import chefCard from '@/components/chefCard.vue';
+    import HarlotCard from '@/components/harlotCard.vue';
 
     const {recipes,isLoading:recipesLoading,getAllRecipes} = useRecipe();
-    const {chefs,fetchTopUsers} = useUser()
+    const {chefs,harlots,fetchTopUsers,fetchBottomUsers} = useUser()
     onMounted( async () => {
         await getAllRecipes();
         await fetchTopUsers();
+        await fetchBottomUsers();
     })
 
 </script>

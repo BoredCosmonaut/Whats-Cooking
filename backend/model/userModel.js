@@ -172,6 +172,18 @@ async function getTopChefs() {
   }
 }
 
+async function getHarlots() {
+  try {
+    const result = await db.query(`
+      SELECT u.username,u.points,u.user_id,ug.image_name
+      FROM users u
+      LEFT JOIN user_gallery ug ON ug.user_id = u.user_id ORDER BY u.points DESC LIMIT 5`);
+      return result.rows;
+  } catch (error) {
+    console.error('Error while getting harlots:',error);
+  }
+};
+
 
 
 module.exports = {
@@ -185,4 +197,5 @@ module.exports = {
     getPoints,
     adjustUserPoints,
     getTopChefs,
+    getHarlots
 }

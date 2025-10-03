@@ -180,7 +180,17 @@ async function getTopChefs(req,res) {
         console.error('Error while fetching chefs:', error)
         res.status(500).json({message:'Couldnt fetch top chefs'});
     }
-}
+};
+
+async function getHarlots(req,res) {
+    try {
+        const harlots = await userModel.getHarlots();
+        res.status(200).json({message:'Harlots fetched', harlots:harlots});
+    } catch (error) {
+        console.error('Error while fetching chefs:',error);
+        res.status(500).json({message:'Couldnt fetch top chefs'});
+    };
+};
 
 
 module.exports = {
@@ -192,5 +202,6 @@ module.exports = {
     updatePassword,
     getUserPoınts,
     adjustUserPoints,
-    getTopChefs
+    getTopChefs,
+    getHarlots
 }
