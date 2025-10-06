@@ -20,7 +20,7 @@ export async function getTopChefs() {
     return result.data;
 }
 
-export async function getHarlots() {
-    const result = await api.get(`/users/harlots`);
+export async function getClowns() {
+    const result = await api.get(`/users/clowns`);
     return result.data;
 }

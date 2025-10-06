@@ -172,7 +172,7 @@ async function getTopChefs() {
   }
 }
 
-async function getHarlots() {
+async function getClowns() {
   try {
     const result = await db.query(`
       SELECT u.username,u.points,u.user_id,ug.image_name
@@ -197,5 +197,5 @@ module.exports = {
     getPoints,
     adjustUserPoints,
     getTopChefs,
-    getHarlots
+    getClowns
 }

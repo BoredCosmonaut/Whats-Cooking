@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const userModel = require('../model/userModel');
 const generateToken = require('../utils/generateToken');
+const { get } = require('../routes/userRoutes');
 
 async function registerUser(req,res) {
     const {email,password,username} = req.body;
@@ -182,10 +183,10 @@ async function getTopChefs(req,res) {
     }
 };
 
-async function getHarlots(req,res) {
+async function getClowns(req,res) {
     try {
-        const harlots = await userModel.getHarlots();
-        res.status(200).json({message:'Harlots fetched', harlots:harlots});
+        const clowns = await userModel.getClowns();
+        res.status(200).json({message:'clowns fetched', clowns:clowns});
     } catch (error) {
         console.error('Error while fetching chefs:',error);
         res.status(500).json({message:'Couldnt fetch top chefs'});
@@ -203,5 +204,5 @@ module.exports = {
     getUserPoınts,
     adjustUserPoints,
     getTopChefs,
-    getHarlots
+    getClowns
 }

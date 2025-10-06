@@ -4,15 +4,18 @@
             <h1 class="recipes">Recipes</h1>
             <p v-if="recipesLoading">Loading recipes...</p>
             <div v-if="recipes.length" class="recipe-cards">
-                <RecipeCard 
+                <RouterLink
                     v-for="recipe in recipes"
                     :key="recipe.recipe_id"
-                    :recipe="recipe"
-                />
+                    :to="`/recipe/${recipe.recipe_id}`"
+                    class="no-style-link recipe-cards "
+                >
+                    <RecipeCard :recipe="recipe"  class="content"/>
+                </RouterLink>
             </div>
         </div>
         <div class="featured">
-
+            <h2>Top</h2>
             <div class="top">
                 <chefCard 
                     v-for="chef in chefs"
@@ -20,11 +23,12 @@
                     :chef="chef"
                 />
             </div>
+            <h2>clowns</h2>
             <div class="bottom">
-                <HarlotCard 
-                    v-for="harlot in harlots"
-                    :key="harlot.user_id"
-                    :harlot = "harlot"
+                <clownCard 
+                    v-for="clown in clowns"
+                    :key="clown.user_id"
+                    :clown= "clown"
                 />
             </div>
         </div>
@@ -37,10 +41,10 @@
     import RecipeCard from '@/components/recipeCard.vue';
     import { useUser } from '@/composables/useUsers';
     import chefCard from '@/components/chefCard.vue';
-    import HarlotCard from '@/components/harlotCard.vue';
+    import clownCard from '@/components/clownCard.vue';
 
     const {recipes,isLoading:recipesLoading,getAllRecipes} = useRecipe();
-    const {chefs,harlots,fetchTopUsers,fetchBottomUsers} = useUser()
+    const {chefs,clowns,fetchTopUsers,fetchBottomUsers} = useUser()
     onMounted( async () => {
         await getAllRecipes();
         await fetchTopUsers();
@@ -57,5 +61,9 @@
 .recipe-cards {
     display: flex;
     flex-direction: row;
+}
+
+.no-style-link {
+    text-decoration: none;
 }
 </style>

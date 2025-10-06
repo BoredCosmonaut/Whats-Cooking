@@ -4,6 +4,7 @@ import RegisterView from '@/views/registerView.vue'
 import HomeView from '@/views/homeView.vue'
 import mainLayout from '@/layouts/mainLayout.vue'
 import ProfileView from '@/views/profileView.vue'
+import RecipeView from '@/views/recipeView.vue'
 const routes = [
   {
     path:'/login',
@@ -23,7 +24,8 @@ const routes = [
     children:[
       {path:'', redirect:'/home'},
       {path:'home',name:'Home', component:HomeView},
-      {path:'profile/:userId', name:'Profile', component:ProfileView}
+      {path:'profile/:userId', name:'Profile', component:ProfileView},
+      {path:'recipe/:recipeId', name:'Recipe', component:RecipeView}
     ]
   }
 ]

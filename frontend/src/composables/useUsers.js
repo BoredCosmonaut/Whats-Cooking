@@ -1,13 +1,13 @@
 import {ref} from 'vue';
 import { getUserInfo as userInfoApı } from '@/services/userService';
 import { getTopChefs as topUserApı} from '@/services/userService';
-import { getHarlots as bottomUserApı } from '@/services/userService';
+import { getClowns as bottomUserApı } from '@/services/userService';
 export function useUser() {
     const user = ref(null);
     const isLoading = ref(false);
     const error = ref(null);
     const chefs = ref([])
-    const harlots = ref([]);
+    const clowns = ref([]);
 
     async function restoreUser() {
         try {
@@ -57,12 +57,12 @@ export function useUser() {
         error.value = null;
         try {
             const data = await bottomUserApı();
-            harlots.value = data.harlots || []
+            clowns.value = data.clowns || []
             return data;
         } catch (error) {
             error.value = error.response?.data?.message || 'Failed to fetch user info'
         }
     }
 
-    return {harlots,chefs,user,isLoading,error,fetchUser,fetchTopUsers,fetchBottomUsers,restoreUser}
+    return {clowns,chefs,user,isLoading,error,fetchUser,fetchTopUsers,fetchBottomUsers,restoreUser}
 }
