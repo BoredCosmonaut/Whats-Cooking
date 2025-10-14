@@ -8,7 +8,6 @@ export function useUser() {
     const error = ref(null);
     const chefs = ref([])
     const clowns = ref([]);
-
     async function restoreUser() {
         try {
             const user_id = localStorage.getItem("userId");

@@ -33,15 +33,17 @@ async function createReview(req,res) {
     }
 };
 
+
+//ADD USER ID AND CHECK İF REVİEW İS LİKED
 async function getReviewsByRecipe(req,res) {
     try {
         const recipe_id = parseInt(req.params.id);
-
+        const user_id = req.user.id;
         if(!recipe_id) {
             return res.status(400).json({message:'Recipe id is empty'})
         };
 
-        const reviews = await reviewModel.getReviewsByRecipe(recipe_id);
+        const reviews = await reviewModel.getReviewsByRecipe(recipe_id,user_id);
 
         if(!reviews || reviews.length === 0) return res.status(200).json({message:'No reviews fpr this recipe'});
         

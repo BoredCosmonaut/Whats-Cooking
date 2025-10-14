@@ -14,35 +14,48 @@ async function addReview(user_id,recipe_id,rating,comment) {
 };
 
 
-async function getReviewsByRecipe(recipe_id) {
-    try {
-        const result = await db.query(
-            `SELECT 
-                r.*, 
-                u.username AS reviewer,
-                COALESCE(
-                    json_agg(
-                        DISTINCT jsonb_build_object(
-                            'image_id', rg.gallery_id,
-                            'image_name', rg.image_name,
-                            'image_url', rg.image_url
-                        )
-                    ) FILTER (WHERE rg.gallery_id IS NOT NULL), '[]'
-                ) AS images
-             FROM reviews r
-             JOIN users u ON r.user_id = u.user_id
-             LEFT JOIN review_gallery rg ON r.review_id = rg.review_id
-             WHERE r.recipe_id = $1
-             GROUP BY r.review_id, u.username
-             ORDER BY r.created_at DESC`,
-            [recipe_id]
-        );
-        return result.rows;
-    } catch (error) {
-        console.error('Error fetching reviews:', error);
-    }
-};
+async function getReviewsByRecipe(recipe_id, user_id) {
+  try {
+    const result = await db.query(
+      `SELECT 
+          r.*, 
+          u.username AS reviewer,
+          COALESCE(
+              json_agg(
+                  DISTINCT jsonb_build_object(
+                      'image_id', rg.gallery_id,
+                      'image_name', rg.image_name,
+                      'image_url', rg.image_url
+                  )
+              ) FILTER (WHERE rg.gallery_id IS NOT NULL), '[]'
+          ) AS images,
+          COALESCE(hc.helpful_count, 0) AS helpful_count,
+          CASE 
+              WHEN rh.user_id IS NOT NULL THEN true
+              ELSE false
+          END AS liked_by_user
+       FROM reviews r
+       JOIN users u ON r.user_id = u.user_id
+       LEFT JOIN review_gallery rg ON r.review_id = rg.review_id
+       LEFT JOIN review_helpful rh 
+          ON r.review_id = rh.review_id AND rh.user_id = $2
+       LEFT JOIN (
+          SELECT review_id, COUNT(*) AS helpful_count
+          FROM review_helpful
+          GROUP BY review_id
+       ) hc ON r.review_id = hc.review_id
+       WHERE r.recipe_id = $1
+       GROUP BY r.review_id, u.username, rh.user_id, hc.helpful_count
+       ORDER BY r.created_at DESC`,
+      [recipe_id, user_id]
+    );
 
+    return result.rows;
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    throw error;
+  }
+}
 
 async function addReviewImage(review_id,image_name,image_url) {
     try {
@@ -75,7 +88,7 @@ async function removeReview(review_id,user_id,isAdmin) {
             query = 'DELETE FROM reviews WHERE review_id = $1 RETURNING *';
             params = [review_id]; 
         } else {
-            query ='DELETE FROM reviews WHERE review_id = $1 and user_id = user_id';
+            query ='DELETE FROM reviews WHERE review_id = $1 and user_id = $2 RETURNING *';
             params = [review_id,user_id];
         }
 

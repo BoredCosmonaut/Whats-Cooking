@@ -14,7 +14,7 @@ router.post('/helpful/:id', authMiddleware,authorizeRoles('User','Admin'),review
 
 router.get('/reported', authMiddleware,authorizeRoles('Admin'),reviewController.getReportedReviews);
 
-router.get('/:id',reviewController.getReviewsByRecipe);
+router.get('/:id',authMiddleware,authorizeRoles('User','Admin'),reviewController.getReviewsByRecipe);
 
 router.delete('/remove/:id',authMiddleware,authorizeRoles('User','Admin'),reviewController.removeReview);
 

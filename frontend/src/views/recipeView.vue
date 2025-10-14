@@ -1,5 +1,5 @@
 <script setup> 
-    import { onMounted } from 'vue'; 
+    import { onMounted,ref } from 'vue'; 
     import { useRoute } from 'vue-router';
     import { useRecipe } from '@/composables/useRecipe';
     import { useUser } from '@/composables/useUsers';
@@ -8,13 +8,20 @@
     const route = useRoute()
     const {recipe,isLoading,error,getRecipeById} = useRecipe()
     const {user,fetchUser} = useUser();
-    const {reviews,getReviewsForRecipe} = useReview()
+    const {reviews,getReviewsForRecipe,postReview} = useReview()
     const recipe_id = route.params.recipeId;
+    const newReview = ref({
+      rating: '',
+      comment: '',
+      image: null,
+    });
+
 
     onMounted( async() => {
         try {
             await getRecipeById(recipe_id);
             await getReviewsForRecipe(recipe_id);
+            console.log(reviews);
             if(recipe.value?.submitted_by) {
                 await fetchUser(recipe.value.submitted_by)
             }
@@ -23,6 +30,27 @@
             console.log('Error while getting recipe:',error)
         }
     })
+
+    async function  handleSubmitReview() {
+      try {
+        if(!newReview.value.rating && !newReview.value.comment && !newReview.value.image) {
+          alert('Please fill in both rating and comment.');
+          return;
+        }
+
+        await postReview(recipe_id,newReview.value);
+        await getReviewsForRecipe(recipe_id);
+        alert('✅ Review added successfully!');
+        newReview.value = { rating: '', comment: '', image: null };
+      } catch (error) {
+        alert('❌ Failed to post review.');
+      }
+    }
+
+    function handleReviewDeleted(id) {
+      reviews.value = reviews.value.filter(r => r.review_id !== id);
+    }
+
 </script>
 
 <template>
@@ -66,11 +94,38 @@
         <p v-if="isLoading">Loading...</p>
         <p v-if="error">{{ error }}</p>
     </div>
+
+    <section class="add-review">
+      <h2>Leave a Review</h2>
+      <form @submit.prevent="handleSubmitReview" class="review-form">
+        <label>
+          Rating:
+          <select v-model="newReview.rating" required>
+            <option disabled value="">Select rating</option>
+            <option v-for="n in 5" :key="n" :value="n">{{ n }}</option>
+          </select>
+        </label>
+
+        <label>
+          Comment:
+          <textarea v-model="newReview.comment" required placeholder="Write your review..."></textarea>
+        </label>
+
+        <label>
+          Image (optional):
+          <input type="file" accept="image/*" @change="e => newReview.image = e.target.files[0]" />
+        </label>
+
+        <button type="submit" class="submit-btn">Submit Review</button>
+      </form>
+    </section>
+
     <div class="reviews" v-if="reviews.length">
       <reviewCard 
         v-for="review in reviews"
         :key="review.review_id"
         :review="review"
+        :onDeleted="handleReviewDeleted"
       />
     </div>
   </main>
