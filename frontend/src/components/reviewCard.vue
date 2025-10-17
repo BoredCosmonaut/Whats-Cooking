@@ -13,7 +13,7 @@
     }
   });
 
-  const { markReviewHelpful, unmarkReviewHelpful,removeReview } = useReview();
+  const { markReviewHelpful, unmarkReviewHelpful,removeReview,reportReview } = useReview();
   const userId = Number(localStorage.getItem('userId'));
   const reviewState = ref({ ...props.review });
   console.log('User from composable:', userId)
@@ -58,6 +58,17 @@
     }
   }
 
+  async function handleReport() {
+    const reason = prompt('Please enter a reason for reporting this review:')
+    if (!reason) return alert('You must enter a reason to report.')
+    try {
+      const res = await reportReview(reviewState.value.review_id,reason);
+      alert(res.message || 'Review reported!')
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to report review.')
+    }
+  }
+
 </script>
 
 <template>
@@ -92,6 +103,14 @@
         👍 {{ reviewState.liked_by_user ? "Unlike" : "Like" }}
         ({{ reviewState.helpful_count ?? 0 }})
       </button>
+
+      <button 
+        @click="handleReport" 
+        class="report-btn"
+      >
+        🚩 Report
+      </button>
+
 
       <button
         v-if="userId && userId === reviewState.user_id"
@@ -181,4 +200,19 @@
 .delete-btn:hover {
   background: #d9363e;
 }
+
+.report-btn {
+  background: #ff9800;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.report-btn:hover {
+  background: #e68900;
+}
+
 </style>

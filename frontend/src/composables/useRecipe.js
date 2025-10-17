@@ -2,6 +2,7 @@ import {ref} from 'vue';
 import { getAllRecipes as allRecipeApi } from '@/services/recipeService';
 import { getUserRecipes as userRecipesApi } from '@/services/recipeService';
 import { getRecipeById as recipeInfoApi } from '@/services/recipeService';
+import { submitRecipe as submitRecipeApi } from '@/services/recipeService';
 export function useRecipe() {
     const recipes = ref([]);
     const isLoading = ref(true);
@@ -49,6 +50,19 @@ export function useRecipe() {
         }
     }
 
-    return {recipe,recipes,isLoading,error,getAllRecipes,getUserRecipes,getRecipeById}
+    async function submitRecipe(formData) {
+        isLoading.value = true;
+        error.value = null;
+        try {
+            const data = await submitRecipeApi(formData);
+            return data;
+        } catch(error) {
+            error.value = error.response?.data?.message || 'Failed to submit recipe';
+        } finally {
+            isLoading.value = false;
+        }
+    }
+
+    return {recipe,recipes,isLoading,error,getAllRecipes,getUserRecipes,getRecipeById,submitRecipe}
 
 }

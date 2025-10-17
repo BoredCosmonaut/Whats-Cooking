@@ -27,6 +27,28 @@ export async function postReview(recipe_id,formData) {
         });
         return res.data
     } catch (error) {
-        console.error('❌ Error posting review:', error);
+        console.error('Error posting review:', error);
     }
+}
+
+export async function reportReview(review_id, reason) {
+  try {
+    const token = localStorage.getItem('token');
+
+    const res = await api.post(
+      `/reviews/report/${review_id}`,
+      { reason }, // send as an object
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    return res.data;
+  } catch (error) {
+    console.error('Error reporting review:', error);
+    throw error;
+  }
 }

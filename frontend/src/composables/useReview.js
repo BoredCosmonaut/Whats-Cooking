@@ -4,6 +4,7 @@ import { markReviewHelpful as markReviewApi } from "@/services/reviewService";
 import { unmarkReviewHelpful as removeLikeApi } from "@/services/reviewService";
 import { removeReview as removeReviewApi } from "@/services/reviewService";
 import { postReview as postReviewApi } from "@/services/reviewService";
+import { reportReview as reportReviewApi } from "@/services/reviewService";
 export function useReview(){
     const reviews = ref([]);
     const isLoading = ref(true);
@@ -75,5 +76,15 @@ export function useReview(){
         }
     }
 
-    return {reviews,isLoading,error,getReviewsForRecipe,markReviewHelpful,unmarkReviewHelpful,removeReview,postReview};
+    async function reportReview(review_id,reason) {
+        try {
+            const res = await reportReviewApi(review_id,reason);
+            
+            return res
+        } catch (error) {
+            console.error('Error while reporting review:',error);
+        }
+    }
+
+    return {reviews,isLoading,error,getReviewsForRecipe,markReviewHelpful,unmarkReviewHelpful,removeReview,postReview,reportReview};
 }
