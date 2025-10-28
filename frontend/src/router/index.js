@@ -5,6 +5,7 @@ import HomeView from '@/views/homeView.vue'
 import mainLayout from '@/layouts/mainLayout.vue'
 import ProfileView from '@/views/profileView.vue'
 import RecipeView from '@/views/recipeView.vue'
+import SubmitRecipeView from '@/views/submitRecipeView.vue'
 const routes = [
   {
     path:'/login',
@@ -25,7 +26,8 @@ const routes = [
       {path:'', redirect:'/home'},
       {path:'home',name:'Home', component:HomeView},
       {path:'profile/:userId', name:'Profile', component:ProfileView},
-      {path:'recipe/:recipeId', name:'Recipe', component:RecipeView}
+      {path:'recipe/:recipeId', name:'Recipe', component:RecipeView},
+      {path:'/submit-recipe', name:'SubmitRecipe', component:SubmitRecipeView}
     ]
   }
 ]

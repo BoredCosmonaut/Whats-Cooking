@@ -5,8 +5,9 @@
     import { useUser } from '@/composables/useUsers';
     import { useReview } from '@/composables/useReview';
     import reviewCard from '@/components/reviewCard.vue';
+    import router from '@/router';
     const route = useRoute()
-    const {recipe,isLoading,error,getRecipeById} = useRecipe()
+    const {recipe,isLoading,error,getRecipeById,deleteRecipe,addFavoriteRecipe,removeFavoriteRecipe,getFavorites} = useRecipe()
     const {user,fetchUser} = useUser();
     const {reviews,getReviewsForRecipe,postReview} = useReview()
     const recipe_id = route.params.recipeId;
@@ -15,17 +16,20 @@
       comment: '',
       image: null,
     });
+    const isFavorite = ref(false)
 
 
     onMounted( async() => {
         try {
             await getRecipeById(recipe_id);
             await getReviewsForRecipe(recipe_id);
-            console.log(reviews);
             if(recipe.value?.submitted_by) {
                 await fetchUser(recipe.value.submitted_by)
             }
             
+            const favorites = await getFavorites();
+            console.log(favorites)
+            isFavorite.value = favorites.some(fav => fav.recipe_id === parseInt(recipe_id));
         } catch (error) {
             console.log('Error while getting recipe:',error)
         }
@@ -51,6 +55,33 @@
       reviews.value = reviews.value.filter(r => r.review_id !== id);
     }
 
+    async function handleFavoriteToggle() {
+      try {
+        if(isFavorite.value) {
+          await removeFavoriteRecipe(recipe_id);
+          isFavorite.value = false;
+          alert('Removed from favorites')
+        } else{
+          await addFavoriteRecipe(recipe_id);
+          isFavorite.value = true;
+          alert('Added to favorites')
+        }
+      } catch (error) {
+        alert('❌ Failed to update favorites');
+      }
+    }
+
+    async function handleDeleteRecipe() {
+      if (!confirm('Are you sure you want to delete this recipe? This action cannot be undone.')) return;
+      try {
+        await deleteRecipe(recipe_id);
+        alert('Recipe deleted!');
+        router.push('/');
+      } catch (error) {
+        alert('❌ Failed to delete recipe.');
+      }
+    }
+
 </script>
 
 <template>
@@ -61,6 +92,15 @@
             <p class="category">{{ recipe.category }}</p>
             <p class="diff">{{ recipe.difficulty }}</p>
             <p class="time">{{ recipe.cooking_time }}</p>
+        </div>
+        <div v-if="user?.info && (user.info.user_id === recipe.submitted_by || user.info.role === 'Admin')" class="recipe-actions">
+        <button 
+          v-if="user?.info" 
+          class="favorite-btn" 
+          @click="handleFavoriteToggle">
+          {{ isFavorite ? '💔 Remove from Favorites' : '❤️ Add to Favorites' }}
+        </button>
+          <button class="delete-btn" @click="handleDeleteRecipe">Delete Recipe</button>
         </div>
         <div class="submitted-by" v-if="user && user.info">
             <p class="username">{{ user.info.username }}</p>
@@ -181,4 +221,41 @@ section {
 h2 {
   margin-bottom: 0.5rem;
 }
+
+.recipe-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.delete-btn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.delete-btn:hover {
+  background: #c0392b;
+}
+
+.favorite-btn {
+  background: #ff4d6d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  margin-right: 1rem;
+  transition: background 0.2s ease;
+}
+
+.favorite-btn:hover {
+  background: #e63950;
+}
+
+
 </style>

@@ -25,3 +25,23 @@ export async function submitRecipe(formData) {
     });
     return result.data
 }
+
+export async function deleteRecipe(recipe_id) {
+    const result = await api.delete(`/recipes/${recipe_id}`)
+    return result.data;
+}
+
+export async function addFavoriteRecipe(recipe_id) {
+    const result = await api.post(`/recipes/favorites/${recipe_id}`)
+    return result.data;
+}
+
+export async function removeFavoriteRecipe(recipe_id) {
+    const result = await api.delete(`/recipes/favorites/${recipe_id}`)
+    return result.data
+}
+
+export async function getUserFavorites() {
+    const result = await api.get('/recipes/favorites')
+    return result.data
+}

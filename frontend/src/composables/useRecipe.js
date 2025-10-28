@@ -3,9 +3,13 @@ import { getAllRecipes as allRecipeApi } from '@/services/recipeService';
 import { getUserRecipes as userRecipesApi } from '@/services/recipeService';
 import { getRecipeById as recipeInfoApi } from '@/services/recipeService';
 import { submitRecipe as submitRecipeApi } from '@/services/recipeService';
+import { deleteRecipe as deleteRecipeApi } from '@/services/recipeService';
+import { addFavoriteRecipe as favoriteRecipeApi } from '@/services/recipeService';
+import { removeFavoriteRecipe as removeFavoriteApi } from '@/services/recipeService';
+import { getUserFavorites as getFavoritesApi } from '@/services/recipeService';
 export function useRecipe() {
     const recipes = ref([]);
-    const isLoading = ref(true);
+    const isLoading = ref(false);
     const error = ref(null);
     const recipe = ref([])
     async function getAllRecipes() {
@@ -51,7 +55,7 @@ export function useRecipe() {
     }
 
     async function submitRecipe(formData) {
-        isLoading.value = true;
+        isLoading.value = false;
         error.value = null;
         try {
             const data = await submitRecipeApi(formData);
@@ -59,10 +63,53 @@ export function useRecipe() {
         } catch(error) {
             error.value = error.response?.data?.message || 'Failed to submit recipe';
         } finally {
-            isLoading.value = false;
+            isLoading.value = true;
         }
     }
 
-    return {recipe,recipes,isLoading,error,getAllRecipes,getUserRecipes,getRecipeById,submitRecipe}
+    async function deleteRecipe(recipe_id) {
+        isLoading.value = false;
+        error.value = null;
+        try {
+            const data = await deleteRecipeApi(recipe_id);
+            return data;
+        } catch(error) {
+            error.value = error.response?.data?.message || 'Failed to delete recipe';
+        } finally {
+            isLoading.value = true;
+        }
+    }
+
+    async function addFavoriteRecipe(recipe_id) {
+        error.value = null;
+        try {
+            const data = await favoriteRecipeApi(recipe_id)
+            return data;
+        } catch (error) {
+            error.value = error.response?.data?.message || 'Failed to add recipe to favs';
+        }
+    }
+
+    async function removeFavoriteRecipe(recipe_id) {
+        error.value = null;
+        try {
+            const data = await removeFavoriteApi(recipe_id)
+            return data
+        } catch (error) {
+            error.value = error.response?.data?.message || 'Failed to remove recipe to favs';
+        }
+    }
+
+    async function getFavorites() {
+        error.value = null;
+        try {
+            const data = await getFavoritesApi()
+            return Array.isArray(data) ? data : data?.favorites || [];
+        } catch (error) {
+            error.value = error.response?.data?.message || 'Failed to get favs';
+        }
+    }
+
+    return {recipe,recipes,isLoading,error,getAllRecipes,getUserRecipes,getRecipeById,submitRecipe,deleteRecipe,addFavoriteRecipe,removeFavoriteRecipe,getFavorites}
 
 }

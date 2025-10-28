@@ -15,7 +15,7 @@ export function useReview(){
         try {
             const response = await reviewInfoApi(recipe_id);
             const data = response.data
-            reviews.value = data.reviews;
+            reviews.value = data.reviews || [];
             return data;
         } catch (error) {
             error.value = error.response?.data?.message || 'Failed to fetch review info';

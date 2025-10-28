@@ -8,7 +8,7 @@ const dynamicUpload = require('../middleware/dynamicUploadMiddleware')
 
 router.post('/submit', authMiddleware, authorizeRoles('User','Admin'),dynamicUpload('recipes').single('image'),rateLimiter.generalRateLimiter, recipeController.createRecipe);
 
-router.post('/favorites',authMiddleware,authorizeRoles('User','Admin'),recipeController.addFavoriteRecipe);
+router.post('/favorites/:id',authMiddleware,authorizeRoles('User','Admin'),recipeController.addFavoriteRecipe);
 
 router.get('/info/:id',recipeController.getRecipeInfoById);
 

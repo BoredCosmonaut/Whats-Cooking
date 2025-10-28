@@ -51,7 +51,7 @@ async function getUserByEmail(email) {
 async function getUserInfoById(user_id) {
     try {
         const user_info = await db.query(`
-                SELECT u.username,u.email,u.password,ug.image_name,ug.image_url 
+                SELECT u.user_id,u.username,u.email,u.password,ug.image_name,ug.image_url 
                 FROM users u LEFT JOIN user_gallery ug 
                 ON  ug.user_id = u.user_id WHERE u.user_id = $1`, [user_id]);
         

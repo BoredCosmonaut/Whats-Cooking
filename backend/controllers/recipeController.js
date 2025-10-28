@@ -233,10 +233,10 @@ async function searchRecipes(req, res) {
 async function addFavoriteRecipe(req,res) {
   try {
     const user_id = req.user.id;
-    const {recipe_id} = req.body;
+    const recipe_id = req.params.id;
 
     const favorites = await recipeModel.addFavoriteRecipe(user_id,recipe_id);
-    if(!favorites) return res.json(200).json({message:'Already in favorites'});
+    if(!favorites) return res.status(200).json({message:'Already in favorites'});
 
     res.status(200).json({message:'Recipe added to favorites'});
   } catch (error) {
