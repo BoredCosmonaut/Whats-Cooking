@@ -43,5 +43,6 @@ export async function removeFavoriteRecipe(recipe_id) {
 
 export async function getUserFavorites() {
     const result = await api.get('/recipes/favorites')
+    console.log(result)
     return result.data
 }

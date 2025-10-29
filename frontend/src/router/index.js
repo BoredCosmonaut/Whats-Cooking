@@ -6,6 +6,7 @@ import mainLayout from '@/layouts/mainLayout.vue'
 import ProfileView from '@/views/profileView.vue'
 import RecipeView from '@/views/recipeView.vue'
 import SubmitRecipeView from '@/views/submitRecipeView.vue'
+import FavoritesView from '@/views/favoritesView.vue'
 const routes = [
   {
     path:'/login',
@@ -27,7 +28,8 @@ const routes = [
       {path:'home',name:'Home', component:HomeView},
       {path:'profile/:userId', name:'Profile', component:ProfileView},
       {path:'recipe/:recipeId', name:'Recipe', component:RecipeView},
-      {path:'/submit-recipe', name:'SubmitRecipe', component:SubmitRecipeView}
+      {path:'/submit-recipe', name:'SubmitRecipe', component:SubmitRecipeView},
+      {path:'/favorites',name:'Favorites', component:FavoritesView}
     ]
   }
 ]

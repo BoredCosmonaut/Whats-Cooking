@@ -265,18 +265,23 @@ async function removeFavoriteRecipe(user_id,recipe_id) {
 };
 
 async function getUserFavorites(user_id) {
-    try {
-        const result = await db.query(`
-                    SELECT r.recipe_id, r.title, r.description, rg.image_name
-                    FROM favorites f
-                    JOIN recipes r ON f.recipe_id = r.recipe_id
-                    LEFT JOIN recipe_gallery rg ON r.recipe_id = rg.recipe_id
-                    WHERE f.user_id = $1`,[user_id]);
-        return result.rows;
-    } catch (error) {
-        console.error('Error while fetching recipes:',error);
-    }
-};
+  try {
+    const result = await db.query(`
+      SELECT r.*, COALESCE(MIN(rg.image_name), '') AS image_name
+      FROM favorites f
+      JOIN recipes r ON f.recipe_id = r.recipe_id
+      LEFT JOIN recipe_gallery rg ON r.recipe_id = rg.recipe_id
+      WHERE f.user_id = $1
+      GROUP BY r.recipe_id
+    `, [user_id]);
+
+    return result.rows || [];
+  } catch (error) {
+    console.error('Error while fetching user favorites:', error);
+    throw error;
+  }
+}
+
 
 async function searchRecipeByIngredients(ingredients) {
     try {

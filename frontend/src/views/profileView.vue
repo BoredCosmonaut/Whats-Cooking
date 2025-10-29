@@ -21,24 +21,25 @@
 </script>
 
 <template>
-    <div class="main-view">
-        <div class="info" v-if="user && user.info">
-            <img :src="`http://localhost:8080/images/profile/${user.info.image_name}`" alt="" class="user-image">
-            <p class="username">{{ user.info.username }}</p>
-            <p class="points">{{ user.points }}</p>     
-        </div>
-        <div class="posts">
-            <h2>Shared Recipes</h2>
-            <div class="recipes">
-                <p v-if="recipesLoading">Loading recipes...</p>
-                <recipeCard
-                    v-for="recipe in recipes"
-                    :key="recipe.recipe_id"
-                    :recipe="recipe"
-                />
-            </div>
-        </div>
+  <div class="main-view">
+    <div class="posts">
+      <h2>Shared Recipes</h2>
+      <div class="recipes">
+        <p v-if="recipesLoading">Loading recipes...</p>
+        <p v-else-if="recipes.length === 0">No recipes shared yet</p>
+
+        <RouterLink
+          v-for="recipe in recipes"
+          :key="recipe.recipe_id"
+          :to="`/recipe/${recipe.recipe_id}`"
+          class="recipe-link"
+        >
+          <recipeCard :recipe="recipe" />
+        </RouterLink>
+      </div>
     </div>
+  </div>
+
 </template>
 
 <style scoped>
