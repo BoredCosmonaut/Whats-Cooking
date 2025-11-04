@@ -43,7 +43,7 @@
 </template>
 
 <style scoped>
-/* Container */
+
 .main-view {
   display: flex;
   flex-direction: column;
@@ -51,38 +51,11 @@
   gap: 2rem;
   font-family: Arial, sans-serif;
   background: #f9f9f9;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-/* User info sidebar */
-.info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  background: #fff;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
 
-.user-image {
-  width: 80px;
-  height: 80px;
-  object-fit: cover; /* ensures image fits nicely */
-  border-radius: 50%;
-  border: 2px solid #ddd;
-}
-
-.username {
-  font-weight: bold;
-  font-size: 1.2rem;
-}
-
-.points {
-  font-size: 0.9rem;
-  color: #555;
-}
-
-/* Recipes section */
 .posts {
   display: flex;
   flex-direction: column;
@@ -90,14 +63,29 @@
 }
 
 .posts h2 {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
+  font-weight: 600;
   margin-bottom: 1rem;
+  color: #333;
 }
 
-/* Recipe cards container */
+
 .recipes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
 }
+
+.recipe-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.recipe-link:hover {
+  transform: translateY(-3px);
+}
+
 </style>

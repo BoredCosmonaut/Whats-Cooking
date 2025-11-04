@@ -7,6 +7,8 @@ import { deleteRecipe as deleteRecipeApi } from '@/services/recipeService';
 import { addFavoriteRecipe as favoriteRecipeApi } from '@/services/recipeService';
 import { removeFavoriteRecipe as removeFavoriteApi } from '@/services/recipeService';
 import { getUserFavorites as getFavoritesApi } from '@/services/recipeService';
+import { updateRecipe as updateRecipeApi } from '@/services/recipeService';
+import { updateRecipeImage as updateRecipeImageApi } from '@/services/recipeService';
 export function useRecipe() {
     const recipes = ref([]);
     const isLoading = ref(false);
@@ -110,6 +112,29 @@ export function useRecipe() {
         }
     }
 
-    return {recipe,recipes,isLoading,error,getAllRecipes,getUserRecipes,getRecipeById,submitRecipe,deleteRecipe,addFavoriteRecipe,removeFavoriteRecipe,getFavorites}
+    async function updateRecipe(recipe_id,data) {
+        error.value = null
+        try {
+            isLoading.value = true
+            const response = await updateRecipeApi(recipe_id,data)
+            return response
+        } catch (err) {
+            error.value = err.response?.data?.message || 'Failed to update the recipe ';
+        } finally {
+            isLoading.value = false
+        }
+    } 
+
+    async function updateRecipeImage(recipe_id,data) {
+        error.value = null
+        try {
+            const response = await updateRecipeImageApi(recipe_id,data)
+            return response
+        } catch (err) {
+            error.value = err.response?.data?.message || 'Failed to update the recipe image';
+        }
+    }
+
+    return {recipe,recipes,isLoading,error,getAllRecipes,getUserRecipes,getRecipeById,submitRecipe,deleteRecipe,addFavoriteRecipe,removeFavoriteRecipe,getFavorites,updateRecipe,updateRecipeImage}
 
 }

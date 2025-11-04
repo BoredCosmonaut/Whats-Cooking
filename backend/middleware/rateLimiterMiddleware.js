@@ -14,7 +14,7 @@ const registerUserLimiter = memoryRateLimiter({
 
 const generalRateLimiter = memoryRateLimiter({
     windowMs: 10 * 60 * 1000, 
-    max: 3,                   
+    max: 5,                   
     keyGenerator: (req) => `${req.user.id}:${req.ip}` 
 });
 

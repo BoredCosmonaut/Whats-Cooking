@@ -46,3 +46,15 @@ export async function getUserFavorites() {
     console.log(result)
     return result.data
 }
+
+export async function updateRecipe(recipe_id,data) {
+    const result = await api.put(`/recipes/update/${recipe_id}`, data)
+    return result
+}
+
+export async function updateRecipeImage(recipe_id,data) {
+    const result = await api.put(`/recipes/update-image/${recipe_id}`,data, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    return result.data
+}

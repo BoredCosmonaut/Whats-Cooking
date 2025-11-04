@@ -1,5 +1,5 @@
 <script setup> 
-    import { onMounted,ref } from 'vue'; 
+    import { onMounted,ref,computed } from 'vue'; 
     import { useRoute } from 'vue-router';
     import { useRecipe } from '@/composables/useRecipe';
     import { useUser } from '@/composables/useUsers';
@@ -18,7 +18,8 @@
     });
     const isFavorite = ref(false)
 
-
+    const loggedInUserId = parseInt(localStorage.getItem('userId'))
+    const loggedInUserRole= (localStorage.getItem('role'))
     onMounted( async() => {
         try {
             await getRecipeById(recipe_id);
@@ -34,6 +35,9 @@
             console.log('Error while getting recipe:',error)
         }
     })
+
+
+
 
     async function  handleSubmitReview() {
       try {
@@ -54,6 +58,20 @@
     function handleReviewDeleted(id) {
       reviews.value = reviews.value.filter(r => r.review_id !== id);
     }
+
+    const canEditOrDelete = computed(() => {
+      if (!recipe?.value) return false
+      return (
+        loggedInUserId === recipe.value.submitted_by ||
+        loggedInUserRole === 'Admin'
+      )
+    })
+
+    const canFavorite = computed(() => {
+      if (!recipe?.value) return false
+      return loggedInUserId !== recipe.value.submitted_by
+    })
+
 
     async function handleFavoriteToggle() {
       try {
@@ -82,6 +100,14 @@
       }
     }
 
+    function handleUpdateRecipe() {
+      router.push(`/recipe/update/${recipe_id}`)
+    }
+
+    const sortedSteps = computed(() => {
+      return recipe.value?.steps ? [...recipe.value.steps].sort((a,b) => a.step_number - b.step_number) : []
+    })
+
 </script>
 
 <template>
@@ -93,15 +119,19 @@
             <p class="diff">{{ recipe.difficulty }}</p>
             <p class="time">{{ recipe.cooking_time }}</p>
         </div>
-        <div v-if="user?.info && (user.info.user_id === recipe.submitted_by || user.info.role === 'Admin')" class="recipe-actions">
+        <div class="recipe-actions">
         <button 
-          v-if="user?.info" 
+          v-if="canFavorite" 
           class="favorite-btn" 
           @click="handleFavoriteToggle">
           {{ isFavorite ? '💔 Remove from Favorites' : '❤️ Add to Favorites' }}
         </button>
-          <button class="delete-btn" @click="handleDeleteRecipe">Delete Recipe</button>
+          <template v-if="canEditOrDelete">
+              <button class="delete-btn" @click="handleDeleteRecipe">Delete Recipe</button>
+              <button class="edit-btn" @click="handleUpdateRecipe">Update Recipe</button>
+          </template>
         </div>
+        
         <div class="submitted-by" v-if="user && user.info">
             <p class="username">{{ user.info.username }}</p>
             <img v-if="user.info.image_name" :src="`http://localhost:8080/images/profile/${user.info.image_name}`" class="user-image">
@@ -125,8 +155,8 @@
         <section class="steps" v-if="recipe.steps?.length">
         <h2>Steps</h2>
         <ol>
-            <li v-for="step in recipe.steps" :key="step.step_number">
-            {{ step.description }}
+            <li v-for="step in sortedSteps" :key="step.step_number">
+              <strong>Step {{ step.step_number }}:</strong> {{ step.description }}
             </li>
         </ol>
         </section>
