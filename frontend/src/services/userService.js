@@ -24,3 +24,20 @@ export async function getClowns() {
     const result = await api.get(`/users/clowns`);
     return result.data;
 }
+
+export async function updateProfileInfo(user_id,data) {
+    const result = await api.put(`/users/profile/${user_id}`, data);
+    return result.data
+}
+
+export async function updateProfilePicture(user_id,data) {
+    const result = await api.put(`/users/profileImage/update/${user_id}`,data,{
+        headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    return result.data
+}
+
+export async function updatePassword(user_id,data) {
+    const result = await api.put(`users/updatePassword/${user_id}`,data)
+    return result.data
+}

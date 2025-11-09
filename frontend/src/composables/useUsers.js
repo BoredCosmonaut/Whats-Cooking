@@ -2,6 +2,9 @@ import {ref} from 'vue';
 import { getUserInfo as userInfoApı } from '@/services/userService';
 import { getTopChefs as topUserApı} from '@/services/userService';
 import { getClowns as bottomUserApı } from '@/services/userService';
+import { updateProfilePicture as profileImageUpdateApi } from '@/services/userService';
+import { updatePassword as passwordUpdateApi } from '@/services/userService';
+import { updateProfileInfo as profileUpdateApi } from '@/services/userService';
 export function useUser() {
     const user = ref(null);
     const isLoading = ref(false);
@@ -63,5 +66,44 @@ export function useUser() {
         }
     }
 
-    return {clowns,chefs,user,isLoading,error,fetchUser,fetchTopUsers,fetchBottomUsers,restoreUser}
+    async function handleImageUpdate(id,file) {
+        error.value = null;
+        try {
+            isLoading.value = true;
+            const data = await profileImageUpdateApi(id,file)
+            return data
+        } catch (error) {
+            error.value = error.response?.data?.message || 'Failed to update user info'
+        } finally {
+            isLoading.value = false
+        }
+    }
+
+    async function updateProfileInfo(id,data) {
+        error.value = null
+        try {
+            isLoading.value = true
+            const res= await profileUpdateApi(id,data)
+            return res;
+        } catch (error) {
+            error.value = error.response?.data?.message || 'Failed to update user info'
+        } finally {
+            isLoading.value = false
+        }
+    }
+
+    async function updatePassword(id,data) {
+        error.value = null
+        try {
+            isLoading.value = true
+            const res = await passwordUpdateApi(id,data)  
+            return res
+        } catch (error) {
+            error.value = error.response?.data?.message || 'Failed to update user info'
+        } finally {
+            isLoading.value = false
+        }
+    }
+
+    return {clowns,chefs,user,isLoading,error,fetchUser,fetchTopUsers,fetchBottomUsers,restoreUser,handleImageUpdate,updateProfileInfo,updatePassword}
 }
