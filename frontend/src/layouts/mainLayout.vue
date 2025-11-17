@@ -28,6 +28,7 @@
             <nav class="router-links">
                 <RouterLink :to="`/home`">Home</RouterLink>
                 <RouterLink :to="`/profile/${userId}`">Profile</RouterLink>
+                <RouterLink :to="`/profile/update/${userId}`">Update Profile</RouterLink>
                 <RouterLink :to="`/submit-recipe`">Submit Recipe</RouterLink>
                 <RouterLink :to="`/favorites`">Favorites</RouterLink>
             </nav>
