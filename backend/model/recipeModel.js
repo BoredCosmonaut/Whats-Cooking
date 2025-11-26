@@ -285,20 +285,29 @@ async function getUserFavorites(user_id) {
 
 async function searchRecipeByIngredients(ingredients) {
     try {
-        const results = await db.query(`
-                    SELECT r.recipe_id, r.title, r.description,r.time,r.diffucilty rg.image_url
-                    FROM recipes r
-                    JOIN recipe_ingredients ri ON r.recipe_id = ri.recipe_id
-                    JOIN ingredients i ON ri.ingredient_id = i.ingredient_id
-                    LEFT JOIN recipe_gallery rg ON r.recipe_id = rg.recipe_id
-                    GROUP BY r.recipe_id, rg.image_url
-                    HAVING EVERY(LOWER(i.ingredient_name) = ANY($1));
-                    `,[ingredients.map((n) => n.toLowerCase())]);
+        if (!ingredients || !Array.isArray(ingredients) || ingredients.length === 0) return [];
+
+        const lowerIngredients = ingredients.map(i => i.toLowerCase());
+        const query = `
+            SELECT r.recipe_id, r.title, r.description, r.cooking_time, r.difficulty, rg.image_url,rg.image_name
+            FROM recipes r
+            JOIN recipe_ingredients ri ON r.recipe_id = ri.recipe_id
+            JOIN ingredients i ON ri.ingredient_id = i.ingredient_id
+            LEFT JOIN recipe_gallery rg ON r.recipe_id = rg.recipe_id
+            WHERE LOWER(i.ingredient_name) = ANY($1)
+            GROUP BY r.recipe_id, rg.image_url, rg.image_name
+            HAVING COUNT(DISTINCT i.ingredient_name) = $2
+        `;
+        const values = [lowerIngredients, lowerIngredients.length];
+
+        const results = await db.query(query, values);
         return results.rows;
     } catch (error) {
-        console.error('Error while finding a recipe:',error)      
+        console.error('Error while finding a recipe:', error);
+        return [];
     }
 };
+
 
 async function getUserRecipes(user_id) {
     try {
@@ -336,6 +345,14 @@ async function getUserRecipes(user_id) {
     }
 };
 
+async function getAllIngs() {
+    try {
+        const results = await db.query(`Select ingredient_name from ingredients`) 
+        return results.rows.map(r => r.ingredient_name);
+    } catch(error) {
+        console.error('Error while getting ings',error)
+    }
+}
 
 
 module.exports = {
@@ -358,5 +375,6 @@ module.exports = {
     removeFavoriteRecipe,
     getUserFavorites,
     searchRecipeByIngredients,
-    getUserRecipes
+    getUserRecipes,
+    getAllIngs
 };

@@ -31,6 +31,7 @@
                 <RouterLink :to="`/profile/update/${userId}`">Update Profile</RouterLink>
                 <RouterLink :to="`/submit-recipe`">Submit Recipe</RouterLink>
                 <RouterLink :to="`/favorites`">Favorites</RouterLink>
+                <RouterLink :to="`/recipes/findRecipe`">What to Cook?</RouterLink>
             </nav>
         </div>
         <main class="main-view">

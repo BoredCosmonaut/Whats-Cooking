@@ -9,6 +9,7 @@ import SubmitRecipeView from '@/views/submitRecipeView.vue'
 import FavoritesView from '@/views/favoritesView.vue'
 import editRecipeView from '@/views/editRecipeView.vue'
 import ProfileEditView from '@/views/profileEditView.vue'
+import FindRecipeView from '@/views/findRecipeView.vue'
 const routes = [
   {
     path:'/login',
@@ -33,7 +34,8 @@ const routes = [
       {path:'/submit-recipe', name:'SubmitRecipe', component:SubmitRecipeView},
       {path:'/favorites',name:'Favorites', component:FavoritesView},
       {path:'/recipe/update/:recipe_id',name:'Update Recipe',component:editRecipeView},
-      {path:'/profile/update/:userId',name:'Update Profile', component:ProfileEditView}
+      {path:'/profile/update/:userId',name:'Update Profile', component:ProfileEditView},
+      {path:'/recipes/findRecipe',name:'Find recipe', component:FindRecipeView}
     ]
   }
 ]

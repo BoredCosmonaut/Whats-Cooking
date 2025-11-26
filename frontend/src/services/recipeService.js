@@ -58,3 +58,13 @@ export async function updateRecipeImage(recipe_id,data) {
     })
     return result.data
 }
+
+export async function findRecipeViaIngs(data) {
+    const result = await api.post(`/recipes/findRecipe`,data)
+    return result.data
+}
+
+export async function getAllIngredients() {
+    const result = await api.get(`/recipes/ingredients`)
+    return result.data
+}

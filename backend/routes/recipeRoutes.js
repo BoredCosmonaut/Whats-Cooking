@@ -16,9 +16,11 @@ router.get('/recipes', recipeController.getAllRecipes);
 
 router.get('/search', recipeController.searchRecipes);
 
+router.get('/ingredients', recipeController.getAllIngredients);
+
 router.get('/favorites', authMiddleware,authorizeRoles('Admin','User'), recipeController.getUserFavorites);
 
-router.get('/findRecipe', recipeController.searchRecipeByIngredients);
+router.post('/findRecipe', recipeController.searchRecipeByIngredients);
 
 router.get('/user/:id', recipeController.getUserRecipes);
 

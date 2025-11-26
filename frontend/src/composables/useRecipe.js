@@ -9,13 +9,14 @@ import { removeFavoriteRecipe as removeFavoriteApi } from '@/services/recipeServ
 import { getUserFavorites as getFavoritesApi } from '@/services/recipeService';
 import { updateRecipe as updateRecipeApi } from '@/services/recipeService';
 import { updateRecipeImage as updateRecipeImageApi } from '@/services/recipeService';
+import {findRecipeViaIngs as searchRecipeByIngredientsApi} from '@/services/recipeService';
+import { getAllIngredients as getAllIngredientsApi } from '@/services/recipeService';
 export function useRecipe() {
     const recipes = ref([]);
     const isLoading = ref(false);
     const error = ref(null);
     const recipe = ref([])
     async function getAllRecipes() {
-        isLoading.value = true;
 
         try {
             const data = await allRecipeApi();
@@ -135,6 +136,34 @@ export function useRecipe() {
         }
     }
 
-    return {recipe,recipes,isLoading,error,getAllRecipes,getUserRecipes,getRecipeById,submitRecipe,deleteRecipe,addFavoriteRecipe,removeFavoriteRecipe,getFavorites,updateRecipe,updateRecipeImage}
+    async function searchRecipesApi(data) {
+        error.value = null;
+        isLoading.value = true; 
+        try {
+            const response = await searchRecipeByIngredientsApi(data); 
+            return response;
+        } catch (err) {
+            console.error(err);
+            error.value = err.response?.data?.message || 'Failed to find any recipe';
+            return null;
+        } finally {
+            isLoading.value = false;
+        }
+    }
+
+
+
+
+
+    async function getAllIngredients() {
+        try {
+            const response = await getAllIngredientsApi();
+            return response
+        } catch (err) {
+            error.value = err.response?.data?.message || 'Failed to get ings';
+        }
+    }
+
+    return {recipe,recipes,isLoading,error,getAllRecipes,getUserRecipes,getRecipeById,submitRecipe,deleteRecipe,addFavoriteRecipe,removeFavoriteRecipe,getFavorites,updateRecipe,updateRecipeImage,searchRecipesApi,getAllIngredients}
 
 }

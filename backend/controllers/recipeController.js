@@ -211,10 +211,10 @@ async function deleteRecipe(req,res) {
 
 async function searchRecipes(req, res) {
   try {
-    const { name } = req.query; // ✅ get the actual string "pasta"
+    const { name } = req.query; 
     
     if (!name) {
-      return res.status(400).json({ message: "Query ?name= is missing" });
+      return res.status(400).json({ message: "Query name is missing" });
     }
 
     const recipes = await recipeModel.searchRecipes(name);
@@ -304,6 +304,16 @@ async function getUserRecipes(req,res) {
   }
 };
 
+async function getAllIngredients(req,res) {
+  try {
+    const ingredients = await recipeModel.getAllIngs()
+    res.status(200).json({ingredients})
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({message:'Failed to fetch ings'})
+  }
+};
+
 module.exports = {
     createRecipe,
     getRecipeInfoById,
@@ -316,5 +326,6 @@ module.exports = {
     removeFavoriteRecipe,
     getUserFavorites,
     searchRecipeByIngredients,
-    getUserRecipes
+    getUserRecipes,
+    getAllIngredients
 }
