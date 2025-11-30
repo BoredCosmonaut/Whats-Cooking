@@ -111,181 +111,400 @@
 </script>
 
 <template>
-  <main class="main">  
-    <div  class="recipe-detail" v-if="recipe">
-        <h1 class="title">{{ recipe.title }}</h1>
-        <div class="meta"> 
-            <p class="category">{{ recipe.category }}</p>
-            <p class="diff">{{ recipe.difficulty }}</p>
-            <p class="time">{{ recipe.cooking_time }}</p>
-        </div>
-        <div class="recipe-actions">
-        <button 
-          v-if="canFavorite" 
-          class="favorite-btn" 
-          @click="handleFavoriteToggle">
-          {{ isFavorite ? '💔 Remove from Favorites' : '❤️ Add to Favorites' }}
-        </button>
-          <template v-if="canEditOrDelete">
-              <button class="delete-btn" @click="handleDeleteRecipe">Delete Recipe</button>
-              <button class="edit-btn" @click="handleUpdateRecipe">Update Recipe</button>
-          </template>
-        </div>
+  <main class="main">
+    <div class="recipe-detail" v-if="recipe">
         
-        <div class="submitted-by" v-if="user && user.info">
-            <p class="username">{{ user.info.username }}</p>
-            <img v-if="user.info.image_name" :src="`http://localhost:8080/images/profile/${user.info.image_name}`" class="user-image">
+        <h1 class="title">{{ recipe.title }}</h1>
+        <hr class="green-divider">
+
+        <div class="header-content">
+            
+            <div class="image-area">
+                <img v-if="recipe.image_name" 
+                    :src="`http://localhost:8080/images/recipes/${recipe.image_name}`" 
+                    class="recipe-image"
+                >
+                <div class="recipe-actions">
+                    <button 
+                      v-if="canFavorite" 
+                      class="favorite-btn" 
+                      @click="handleFavoriteToggle"
+                    >
+                      {{ isFavorite ? '💔 Remove from Favorites' : '❤️ Add to Favorites' }}
+                    </button>
+                    <template v-if="canEditOrDelete">
+                        <button class="edit-btn" @click="handleUpdateRecipe">Update</button>
+                        <button class="delete-btn" @click="handleDeleteRecipe">Delete</button>
+                    </template>
+                </div>
+            </div>
+            
+            <div class="meta-info">
+                
+                <section class="meta-box">
+                    <p class="meta-item"><span class="label">Category:</span> {{ recipe.category }}</p>
+                    <p class="meta-item"><span class="label">Difficulty:</span> {{ recipe.difficulty }}</p>
+                    <p class="meta-item"><span class="label">Cooking Time:</span> {{ recipe.cooking_time }} minutes</p>
+                </section>
+
+                <div class="submitted-by" v-if="user && user.info">
+                    <p class="label">Submitted By:</p>
+                    <img v-if="user.info.image_name" 
+                        :src="`http://localhost:8080/images/profile/${user.info.image_name}`" 
+                        class="user-image"
+                    >
+                    <p class="username">{{ user.info.username }}</p>
+                </div>
+                
+                <section class="desc-box">
+                    <h2 class="section-title">Description</h2>
+                    <p class="description-text">{{ recipe.description }}</p>
+                </section>
+                
+            </div>
         </div>
-        <img v-if="recipe.image_name"  :src="`http://localhost:8080/images/recipes/${recipe.image_name}`"  class="recipe-image">
+        <hr class="green-divider">
 
-        <section class="desc-box">
-            <h2 class="desc">Description</h2>
-            <p>{{ recipe.description }}</p>
-        </section>
-
-        <section class="ingredients">
-            <h2 class="ing">Ingredients</h2>
-            <ul>
-                <li v-for="ingredient in recipe.ingredients" :key="ingredient.ingredient_id">
-                    {{ ingredient.quantity }} {{ ingredient.name }}
-                </li>
-            </ul>
-        </section>
-
-        <section class="steps" v-if="recipe.steps?.length">
-        <h2>Steps</h2>
-        <ol>
-            <li v-for="step in sortedSteps" :key="step.step_number">
-              <strong>Step {{ step.step_number }}:</strong> {{ step.description }}
-            </li>
-        </ol>
-        </section>
+        <div class="preparation-sections">
+            <section class="ingredients">
+                <h2 class="section-title">Ingredients</h2>
+                <ul class="ingredient-list">
+                    <li v-for="ingredient in recipe.ingredients" :key="ingredient.ingredient_id">
+                        {{ ingredient.quantity }} {{ ingredient.name }}
+                    </li>
+                </ul>
+            </section>
+            
+            <section class="steps" v-if="recipe.steps?.length">
+                <h2 class="section-title">Steps</h2>
+                <ol class="step-list">
+                    <li v-for="step in sortedSteps" :key="step.step_number">
+                        <span class="step-number-label">Step {{ step.step_number }}:</span> {{ step.description }}
+                    </li>
+                </ol>
+            </section>
+        </div>
 
         <p v-if="isLoading">Loading...</p>
         <p v-if="error">{{ error }}</p>
     </div>
 
+    <hr class="green-divider">
+
     <section class="add-review">
-      <h2>Leave a Review</h2>
-      <form @submit.prevent="handleSubmitReview" class="review-form">
-        <label>
-          Rating:
-          <select v-model="newReview.rating" required>
-            <option disabled value="">Select rating</option>
-            <option v-for="n in 5" :key="n" :value="n">{{ n }}</option>
-          </select>
-        </label>
+        <h2 class="section-title">Leave a Review</h2>
+        <form @submit.prevent="handleSubmitReview" class="review-form">
+            <div class="form-group">
+                <label for="rating">Rating:</label>
+                <select id="rating" v-model="newReview.rating" required class="input-field">
+                    <option disabled value="">Select rating</option>
+                    <option v-for="n in 5" :key="n" :value="n">{{ n }} ⭐</option>
+                </select>
+            </div>
 
-        <label>
-          Comment:
-          <textarea v-model="newReview.comment" required placeholder="Write your review..."></textarea>
-        </label>
+            <div class="form-group">
+                <label for="comment">Comment:</label>
+                <textarea id="comment" v-model="newReview.comment" required placeholder="Write your review..." class="input-field"></textarea>
+            </div>
 
-        <label>
-          Image (optional):
-          <input type="file" accept="image/*" @change="e => newReview.image = e.target.files[0]" />
-        </label>
+            <div class="form-group">
+                <label>Image (optional):</label>
+                <input type="file" accept="image/*" @change="e => newReview.image = e.target.files[0]" class="input-field file-input" />
+            </div>
 
-        <button type="submit" class="submit-btn">Submit Review</button>
-      </form>
+            <button type="submit" class="submit-btn">Submit Review</button>
+        </form>
     </section>
 
-    <div class="reviews" v-if="reviews.length">
-      <reviewCard 
-        v-for="review in reviews"
-        :key="review.review_id"
-        :review="review"
-        :onDeleted="handleReviewDeleted"
-      />
+    <div class="reviews-section" v-if="reviews.length">
+        <h2 class="section-title">User Reviews ({{ reviews.length }})</h2>
+        <div class="review-list">
+            <reviewCard 
+              v-for="review in reviews"
+              :key="review.review_id"
+              :review="review"
+              :onDeleted="handleReviewDeleted"
+            />
+        </div>
     </div>
   </main>
 </template>
 
 <style scoped>
+/* Hex Codes Used:
+#4CAF50 - Primary Green
+#1B5E20 - Dark Green
+#E8F5E9 - Very Light Green
+#E0E0E0 - Light Gray
+#FFFFFF - White
+*/
+
+
+.main {
+    max-width: 1000px; 
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
 .recipe-detail {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 0;
+    background: #fff;
+    border-radius: 8px;
 }
 
 .title {
-  font-size: 2rem;
-  margin-bottom: 1rem;
+    font-size: 2.5rem;
+    color: #1B5E20; 
+    margin-bottom: 0.5rem;
+    text-align: center;
 }
 
-.meta p {
-  margin: 0.25rem 0;
+.section-title {
+    font-size: 1.5rem;
+    color: #4CAF50; 
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #E8F5E9; 
 }
 
-.submitted-by {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin: 1rem 0;
+.green-divider {
+    border: none;
+    border-top: 1px solid #A5D6A7; 
+    margin: 1.5rem 0;
 }
 
-.user-image {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #ddd;
+.label {
+    font-weight: bold;
+    color: #1B5E20;
+    margin-right: 0.5rem;
+}
+
+.header-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr; 
+    gap: 2rem;
+}
+
+.image-area {
+    display: flex;
+    flex-direction: column;
 }
 
 .recipe-image {
-  width: 100%;
-  height: auto;
-  max-height: 400px;
-  object-fit: cover;
-  margin: 1rem 0;
-  border-radius: 8px;
+    width: 100%;
+    height: 350px; 
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
 }
 
-section {
-  margin-top: 1.5rem;
+
+.meta-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 0.5rem 0;
 }
 
-h2 {
-  margin-bottom: 0.5rem;
+.meta-box p {
+    font-size: 1rem;
+    padding: 0.25rem 0;
+    border-bottom: 1px dashed #E0E0E0;
+    color: #444;
 }
+
+.description-text {
+    line-height: 1.6;
+    color: #555;
+    font-style: italic;
+}
+
+.submitted-by {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #E8F5E9; /* Light green background */
+    border-radius: 6px;
+}
+
+.submitted-by .label {
+    margin-right: 1rem;
+}
+
+.user-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #4CAF50;
+    margin-right: 0.5rem;
+}
+
+.username {
+    font-weight: bold;
+    color: #1B5E20;
+    margin: 0;
+}
+
 
 .recipe-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
 }
 
-.delete-btn {
-  background: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.delete-btn:hover {
-  background: #c0392b;
+.favorite-btn, .edit-btn, .delete-btn {
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: none;
 }
 
 .favorite-btn {
-  background: #ff4d6d;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  margin-right: 1rem;
-  transition: background 0.2s ease;
+    background: #A5D6A7; 
+    color: #1B5E20;
 }
 
 .favorite-btn:hover {
-  background: #e63950;
+    background: #4CAF50;
+    color: #FFFFFF;
+}
+
+.edit-btn {
+    background: #4CAF50;
+    color: white;
+}
+.edit-btn:hover {
+    background: #1B5E20;
+}
+
+.delete-btn {
+    background: #f44336;
+    color: white;
+}
+.delete-btn:hover {
+    background: #d32f2f;
+}
+
+.preparation-sections {
+    display: grid;
+    grid-template-columns: 1fr 2fr; 
+    gap: 3rem;
+    margin-bottom: 2rem;
+    padding-top: 1rem;
+}
+
+.ingredient-list {
+    list-style-type: none; 
+    padding-left: 0;
+}
+
+.ingredient-list li {
+    padding: 0.4rem 0;
+    border-bottom: 1px dashed #E8F5E9;
+    color: #555;
+}
+
+.step-list {
+    padding-left: 20px;
+}
+
+.step-list li {
+    margin-bottom: 1rem;
+    line-height: 1.5;
+    color: #333;
+}
+
+.step-number-label {
+    font-weight: bold;
+    color: #4CAF50;
+    margin-right: 0.5rem;
 }
 
 
+.add-review {
+    padding: 1.5rem;
+    background-color: #f9f9f9; 
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.review-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: #1B5E20;
+}
+
+.input-field {
+    padding: 0.6rem;
+    border: 1px solid #E0E0E0;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.input-field:focus {
+    border-color: #4CAF50;
+    outline: none;
+}
+
+textarea.input-field {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.submit-btn {
+    background: #4CAF50;
+    color: white;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background 0.2s;
+}
+
+.submit-btn:hover {
+    background: #1B5E20;
+}
+
+
+.reviews-section {
+    padding: 1rem 0;
+}
+
+.review-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    gap: 2.5rem; 
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        grid-template-columns: 1fr; 
+    }
+    
+    .preparation-sections {
+        grid-template-columns: 1fr;
+    }
+    
+    .recipe-image {
+        height: 250px; 
+    }
+}
 </style>

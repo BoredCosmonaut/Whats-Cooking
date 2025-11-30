@@ -73,146 +73,201 @@
 
 <template>
   <div class="review-card">
-    <div class="review-header">
-      <div class="reviewer-info">
-        <h3 class="username">{{ reviewState.reviewer }}</h3>
-        <p class="date">{{ new Date(reviewState.created_at).toLocaleDateString() }}</p>
-      </div>
-      <div v-if="reviewState.rating" class="rating">
-        ⭐ {{ reviewState.rating }}/5
-      </div>
-    </div>
-
-    <p class="review-text">{{ reviewState.comment }}</p>
-
-    <div v-if="reviewState.images && reviewState.images.length" class="image-gallery">
+    
+    <div v-if="reviewState.images && reviewState.images.length" class="review-media-area">
       <img
-        v-for="image in reviewState.images"
-        :key="image.image_id"
-        :src="`http://localhost:8080/images/reviews/${image.image_name}`"
+        :src="`http://localhost:8080/images/reviews/${reviewState.images[0].image_name}`"
         alt="Review image"
-        class="review-image"
+        class="review-image-main"
       />
-    </div>
+      </div>
 
-    <div class="actions">
-      <button
-        @click="handleHelpfulClick"
-        :class="['helpful-btn', reviewState.liked_by_user ? 'active' : '']"
-      >
-        👍 {{ reviewState.liked_by_user ? "Unlike" : "Like" }}
-        ({{ reviewState.helpful_count ?? 0 }})
-      </button>
+    <div class="review-content-area">
+        <div class="review-header">
+            <h3 class="username">{{ reviewState.reviewer }}</h3>
+            <div v-if="reviewState.rating" class="rating">
+                ⭐ {{ reviewState.rating }}/5
+            </div>
+        </div>
 
-      <button 
-        @click="handleReport" 
-        class="report-btn"
-      >
-        🚩 Report
-      </button>
+        <p class="review-text-compact">{{ reviewState.comment }}</p>
+
+        <div class="actions">
+            <button
+                @click="handleHelpfulClick"
+                :class="['helpful-btn', reviewState.liked_by_user ? 'active' : '']"
+            >
+                👍 ({{ reviewState.helpful_count ?? 0 }})
+            </button>
+
+            <button 
+                @click="handleReport" 
+                class="report-btn"
+            >
+                🚩 Report
+            </button>
 
 
-      <button
-        v-if="userId && userId === reviewState.user_id"
-        class="delete-btn"
-        @click="handleDelete"
-      >
-        🗑 Delete
-      </button>
+            <button
+                v-if="userId && userId === reviewState.user_id"
+                class="delete-btn"
+                @click="handleDelete"
+            >
+                🗑 Delete
+            </button>
+        </div>
+        <p class="date">{{ new Date(reviewState.created_at).toLocaleDateString() }}</p>
     </div>
   </div>
 </template>
 
 <style scoped>
+/* Hex Codes Used:
+#4CAF50 - Primary Green
+#1B5E20 - Dark Green
+#E8F5E9 - Very Light Green
+#E0E0E0 - Light Gray
+#FFFFFF - White
+*/
 .review-card {
-  background: #fff;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  margin-bottom: 1.5rem;
-  transition: transform 0.2s ease;
+    display: flex; 
+    flex-direction: column; 
+    width: 300px; 
+    height: 450px;
+    background: #FFFFFF;
+    border-radius: 8px;
+    border: 2px solid #E0E0E0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 0; 
+    margin-bottom: 0; 
+    transition: border-color 0.2s ease;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
 }
+
 .review-card:hover {
-  transform: translateY(-2px);
+    border-color: #4CAF50;
 }
+
+
+.review-media-area {
+    width: 100%;
+    height: 60%; 
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.review-image-main {
+    width: 95%; 
+    height: 95%;
+    object-fit: cover;
+    display: block;
+}
+
+.review-content-area {
+    width: 100%;
+    height: 40%;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
 .review-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px dashed #E8F5E9;
 }
+
 .username {
-  font-weight: 600;
-  color: #333;
+    font-weight: 700;
+    color: #1B5E20; 
+    font-size: 1.1rem;
+    margin: 0;
 }
+
 .date {
-  font-size: 0.9rem;
-  color: #777;
+    font-size: 0.75rem;
+    color: #999;
 }
+
 .rating {
-  font-weight: 500;
-  color: #f4b400;
+    font-weight: 600;
+    color: #f4b400; 
 }
-.review-text {
-  color: #444;
-  line-height: 1.5;
-  margin-bottom: 1rem;
-}
-.image-gallery {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-.review-image {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 8px;
-  border: 1px solid #ddd;
+
+.review-text-compact {
+    color: #444;
+    line-height: 1.4;
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9rem;
+    display: -webkit-box;
+    line-clamp: 2; 
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; 
+    margin-top: auto;
+    padding-top: 0.5rem;
 }
-.helpful-btn {
-  background: #f0f0f0;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s ease;
+
+.helpful-btn, .report-btn, .delete-btn {
+    border: 1px solid #E0E0E0; 
+    background: #F9F9F9; 
+    padding: 0.3rem 0.6rem; 
+    border-radius: 4px; 
+    cursor: pointer;
+    font-size: 0.75rem; 
+    font-weight: 600;
 }
+
 .helpful-btn.active {
-  background: #4caf50;
-  color: white;
+    background: #4CAF50; 
+    color: #FFFFFF;
 }
+
+.helpful-btn:hover {
+    background: #E8F5E9;
+    border-color: #4CAF50;
+    color: #1B5E20;
+}
+
 .delete-btn {
-  background: #ff4d4f;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-.delete-btn:hover {
-  background: #d9363e;
+    background: none;
+    color: #ff4d4f;
+    border-color: #ff4d4f;
 }
 
 .report-btn {
-  background: #ff9800;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s ease;
+    background: none;
+    color: #ff9800;
+    border-color: #ff9800;
 }
 
-.report-btn:hover {
-  background: #e68900;
+.image-gallery, .review-image {
+    display: none; 
 }
 
+@media (max-width: 600px) {
+    .review-card {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+    }
+    .review-media-area {
+        height: 200px;  
+    }
+}
 </style>
