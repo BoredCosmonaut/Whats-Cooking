@@ -168,7 +168,7 @@
 }
 
 .review-content-area {
-    width: 100%;
+    width: 90%;
     height: 40%;
     padding: 1rem;
     display: flex;

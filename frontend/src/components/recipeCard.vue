@@ -1,5 +1,5 @@
 <template> 
-    <div class="recipe-card">
+    <div class="recipe-card" :class="{'compact-mode': compact}">
         <div class="image-wrapper">
             <img 
                 :src="`http://localhost:8080/images/recipes/${recipe.image_name}`" 
@@ -28,6 +28,10 @@ import { defineProps } from 'vue';
         recipe:{
             type: Object,
             required: true
+        },
+        compact:{
+            type:Boolean,
+            default:false
         }
     })
 </script>
@@ -58,6 +62,8 @@ import { defineProps } from 'vue';
     width: 100%;
     height: 70%; 
     overflow: hidden;
+    image-resolution: initial;
+    background-size: cover;
     background-color: transparent; 
     display: flex;
     justify-content: center; 
@@ -119,5 +125,21 @@ import { defineProps } from 'vue';
 .recipe-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+}
+
+.recipe-card.compact-mode .image-wrapper {
+    height: 400px; 
+}
+
+.recipe-card.compact-mode .card-content {
+    padding: 0.75rem 1rem;
+}
+
+.recipe-card.compact-mode .card-details {
+    gap: 0.9rem;
+}
+
+.recipe-card.compact-mode .submitted-by {
+    padding-top: 0.25rem;
 }
 </style>

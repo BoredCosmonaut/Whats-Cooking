@@ -75,8 +75,10 @@
 </script>
 
 <template>
-    <main class="profile-setting">
-        <h1>Update Profile</h1>
+    <div class="profile-layout">
+        <main class="profile-setting">
+            <h1>Update Profile</h1>
+            
             <section class="card">
                 <h2>General Info</h2>
                 <label>Username</label>
@@ -88,85 +90,178 @@
 
             <section class="card">
                 <h2>Profile Picture</h2>
-
                 <img :src="imageUrl" class="profile-pic" alt="">
-
                 <input type="file" accept="image/*" @change="handleFileChange">
-
                 <button @click="submitProfileImage" :disabled="isLoading">Update Image</button>
             </section>
 
             <section class="card">
                 <h2>Change Password</h2>
-                <label >Current Password</label>
+                <label>Current Password</label>
                 <input type="password" v-model="currentPassword">
-                <label >New Password</label>
+                <label>New Password</label>
                 <input type="password" v-model="newPassword">
                 <button @click="submitPassword" :disabled="isLoading">Update Password</button>
             </section>
-
-    </main>
+        </main>
+        
+        <aside class="profile-sidebar">
+            <h3>Help & Security Tips</h3>
+            <ul>
+                <li>**Username:** Must be unique. Changes might be limited.</li>
+                <li>**Email:** Used for account verification and password recovery.</li>
+                <li>**Passwords:** Choose a strong password (minimum 12 characters recommended).</li>
+                <li>**Image:** Max file size is 2MB. Use a square image for best display results.</li>
+            </ul>
+        </aside>
+    </div>
 </template>
 
 <style scoped>
-.profile-settings {
-  max-width: 750px;
-  margin: 0 auto;
-  padding: 2rem;
+/* Hex Codes Used:
+#4CAF50 - Primary Green
+#1B5E20 - Dark Green
+#E8F5E9 - Very Light Green
+#E0E0E0 - Light Gray
+#FFFFFF - White
+*/
+
+.profile-layout {
+    max-width: 1000px; 
+    margin: 0 auto;
+    display: flex;
+    gap: 40px;
+    padding: 2.5rem 1rem;
+}
+
+.profile-setting {
+    width: 600px; 
+    flex-shrink: 0;
+    margin: 0; 
+    background: #FFFFFF;
+}
+
+.profile-sidebar {
+    flex-grow: 1;
+    padding-top: 5rem; 
+    color: #333;
+}
+
+.profile-sidebar h3 {
+    color: #1B5E20; 
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #E8F5E9;
+    font-weight: 700;
+}
+
+.profile-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.profile-sidebar li {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 8px;
+    border-left: 3px solid #A5D6A7; 
+    padding-left: 10px;
 }
 
 h1 {
-  text-align: center;
-  margin-bottom: 2rem;
+    margin-bottom: 2rem;
+    font-size: 2.2rem;
+    color: #1B5E20; 
 }
 
 .card {
-  background: #fff;
-  padding: 1.7rem;
-  margin-bottom: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
+    background: none;
+    padding: 1.5rem 0; 
+    margin-bottom: 0;
+    border-radius: 0;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    border-top: 1px solid #E0E0E0; 
+}
+
+.profile-setting section:first-of-type {
+    border-top: none;
 }
 
 .card h2 {
-  margin-bottom: 0.5rem;
+    color: #4CAF50; 
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #E8F5E9; 
+    align-self: flex-start; 
+}
+
+label {
+    font-weight: 600;
+    color: #1B5E20; 
+    margin-bottom: -0.5rem; 
 }
 
 input {
-  padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #E0E0E0;
+    border-radius: 4px; 
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px #E8F5E9; 
+    outline: none;
 }
 
 button {
-  align-self: flex-start;
-  background: #2c7be5;
-  color: white;
-  border: none;
-  padding: 0.7rem 1.1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-top: 0.5rem;
+    align-self: flex-start;
+    background: #4CAF50; 
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 1rem;
+    font-weight: 600;
+    transition: background 0.2s;
 }
 
-button:hover {
-  background: #1a5fc4;
+button:hover:not(:disabled) {
+    background: #1B5E20; 
+}
+
+button:disabled {
+    background: #A5D6A7;
+    cursor: not-allowed;
 }
 
 .profile-pic {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 50%;
-  margin-bottom: 1rem;
+    width: 100px; 
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin: 0.5rem 0 1rem 0;
+    border: 3px solid #E8F5E9;
+    align-self: flex-start; 
+}
+
+.card input[type="file"] {
+    border: none;
+    padding: 0;
 }
 
 .error {
-  color: red;
-  text-align: center;
-  font-weight: 600;
+    color: #ff4d4f;
+    text-align: left; 
+    font-weight: 600;
 }
 </style>
