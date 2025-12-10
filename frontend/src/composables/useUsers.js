@@ -11,6 +11,7 @@ export function useUser() {
     const error = ref(null);
     const chefs = ref([])
     const clowns = ref([]);
+    const passwordError = ref(null)
     async function restoreUser() {
         try {
             const user_id = localStorage.getItem("userId");
@@ -72,8 +73,8 @@ export function useUser() {
             isLoading.value = true;
             const data = await profileImageUpdateApi(id,file)
             return data
-        } catch (error) {
-            error.value = error.response?.data?.message || 'Failed to update user info'
+        } catch (err) {
+           error.value = err.response.data?.message || 'Failed to update user info'
         } finally {
             isLoading.value = false
         }
@@ -85,25 +86,25 @@ export function useUser() {
             isLoading.value = true
             const res= await profileUpdateApi(id,data)
             return res;
-        } catch (error) {
-            error.value = error.response?.data?.message || 'Failed to update user info'
+        } catch (err) {
+           error.value = err.response.data?.message || 'Failed to update user info'
         } finally {
             isLoading.value = false
         }
     }
 
     async function updatePassword(id,data) {
-        error.value = null
+        passwordError.value = null
         try {
             isLoading.value = true
             const res = await passwordUpdateApi(id,data)  
             return res
-        } catch (error) {
-            error.value = error.response?.data?.message || 'Failed to update user info'
+        } catch (err) {
+            passwordError.value = err.response.data?.message || 'Failed to update user info'
         } finally {
             isLoading.value = false
         }
     }
 
-    return {clowns,chefs,user,isLoading,error,fetchUser,fetchTopUsers,fetchBottomUsers,restoreUser,handleImageUpdate,updateProfileInfo,updatePassword}
+    return {clowns,chefs,user,isLoading,error,passwordError,fetchUser,fetchTopUsers,fetchBottomUsers,restoreUser,handleImageUpdate,updateProfileInfo,updatePassword}
 }

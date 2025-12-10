@@ -69,6 +69,7 @@
     }
   }
 
+const BASE_URL = process.env.VUE_APP_API_BASE_URL;
 </script>
 
 <template>
@@ -76,7 +77,7 @@
     
     <div v-if="reviewState.images && reviewState.images.length" class="review-media-area">
       <img
-        :src="`http://localhost:8080/images/reviews/${reviewState.images[0].image_name}`"
+        :src="`${BASE_URL}/images/reviews/${reviewState.images[0].image_name}`"
         alt="Review image"
         class="review-image-main"
       />

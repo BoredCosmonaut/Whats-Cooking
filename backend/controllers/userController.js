@@ -6,8 +6,16 @@ const { get } = require('../routes/userRoutes');
 async function registerUser(req,res) {
     const {email,password,username} = req.body;
     try {
-        const existingUser = await userModel.getUserByEmail(email);
-        if(existingUser) return res.status(400).json({message:'Email already exists'});
+        const usernameExists = await userModel.checkUsernameExists(username);
+        if (usernameExists) {
+            return res.status(409).json({ message: 'Username is already taken.' });
+        }
+
+
+        const emailExists = await userModel.checkEmailExists(email);
+        if (emailExists) {
+            return res.status(409).json({ message: 'Email is already registered.' });
+        }
         const hashedPassword = await bcrypt.hash(password,10);
         const newUser = await userModel.createUser({
             username,
@@ -93,21 +101,54 @@ async function updateProfilePicture(req,res) {
     }
 };
 
-async function updateUserInfo(req,res) {
+async function updateUserInfo(req, res) {
+    const { username, email } = req.body;
+    const user_id = parseInt(req.params.id);
     try {
-        const user_id = parseInt(req.params.id);
-        if(user_id !== req.user.id && req.user.role !== 'Admin') return res.status(403).json({message:'You can only update your own info'});
+        if (user_id !== req.user.id && req.user.role !== 'Admin') {
+            return res.status(403).json({ message: 'You can only update your own info.' });
+        }
 
-        const {username,email} = req.body;
+        if (!username && !email) {
+            return res.status(400).json({ message: 'Username or email required.' });
+        }
+        
+        const currentUser = await userModel.getUserInfoById(user_id); 
+        if (!currentUser) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
 
-        if (!username && !email) return res.status(400).json({message:'Username or email required'})
+        const checks = [];
+        
+        if (username && username !== currentUser.username) {
+            checks.push(userModel.checkUsernameExists(username));
+        } else {
+            checks.push(Promise.resolve(false)); 
+        }
 
-        const updatedUser = await userModel.updateUserInfo(user_id,username,email);
+        if (email && email !== currentUser.email) {
+            checks.push(userModel.checkEmailExists(email));
+        } else {
+             checks.push(Promise.resolve(false)); 
+        }
 
-        res.status(200).json({message:'Updated info fetched', info:updatedUser});
+        const [usernameConflict, emailConflict] = await Promise.all(checks);
+        
+        if (usernameConflict) {
+            return res.status(409).json({ message: 'This username is already taken by another account.' });
+        }
+        
+        if (emailConflict) {
+            return res.status(409).json({ message: 'This email is already registered to another account.' });
+        }
+
+        const updatedUser = await userModel.updateUserInfo(user_id, username, email);
+
+        return res.status(200).json({ message: 'Profile information updated successfully.', info: updatedUser });
+
     } catch (error) {
-        console.error('Error while updating user info:',error);
-        res.status(500).json({message:'Failed update info'});
+        console.error('Error while updating user info:', error);
+        return res.status(500).json({ message: 'Failed update info' });
     }
 };
 

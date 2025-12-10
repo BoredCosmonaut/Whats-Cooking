@@ -4,7 +4,7 @@
     import { useUser } from '@/composables/useUsers';
 
 
-    const {user,handleImageUpdate,updatePassword,updateProfileInfo,isLoading,fetchUser} = useUser();
+    const {user,handleImageUpdate,updatePassword,updateProfileInfo,isLoading,fetchUser,error,passwordError} = useUser();
     const route = useRoute();
     const username = ref('');
     const email = ref('');
@@ -13,7 +13,7 @@
     const imageFile = ref(null);
     const imageUrl = ref('')
     const user_id = route.params.userId;
-
+    const BASE_URL = process.env.VUE_APP_API_BASE_URL;
     watch(
         () => user.value,
         (val) => {
@@ -21,7 +21,7 @@
                 username.value = val.username || '';
                 email.value = val.email || '';
                 currentPassword.value = '';     
-                imageUrl.value = val.image_url ? `http://localhost:8080${val.image_url}` : '';
+                imageUrl.value = val.image_url ? `${BASE_URL}${val.image_url}` : '';
             }
         },
         {immediate:true}
@@ -69,7 +69,7 @@
     onMounted(async () => {
         const data = await fetchUser(user_id)
         user.value = data.info  
-        console.log(user.value.image_url)
+        console.log(user.value)
     })
 
 </script>
@@ -85,6 +85,7 @@
                 <input type="text" v-model="username">
                 <label>Email</label>
                 <input type="text" v-model="email">
+                <p v-if="error" class="error-message">{{ error }}</p>
                 <button @click="submitGeneralInfo" :disabled="isLoading">Update Info</button>
             </section>
 
@@ -101,6 +102,7 @@
                 <input type="password" v-model="currentPassword">
                 <label>New Password</label>
                 <input type="password" v-model="newPassword">
+                <p v-if="passwordError" class="error-message">{{ passwordError }}</p>
                 <button @click="submitPassword" :disabled="isLoading">Update Password</button>
             </section>
         </main>
@@ -263,5 +265,12 @@ button:disabled {
     color: #ff4d4f;
     text-align: left; 
     font-weight: 600;
+}
+
+.error-message {
+    color: #D32F2F; 
+    text-align: left;
+    font-weight: 600;
+    margin-top: -0.5rem; 
 }
 </style>

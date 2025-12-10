@@ -2,7 +2,7 @@
     <div class="main-layout">
         <div class="sidebar" v-if="user && user.info">
             <div class="info">
-                <img :src="`http://localhost:8080/images/profile/${user.info.image_name}`" alt="" class="user-image">
+                <img :src="`${BASE_URL}/images/profile/${user.info.image_name}`" alt="" class="user-image">
                 <p class="username">{{ user.info.username }}</p>
                 <p class="points-badge">{{ user.points }} Points</p> 
             </div>
@@ -38,6 +38,8 @@
         await restoreUser();
       }
     });
+
+const BASE_URL = process.env.VUE_APP_API_BASE_URL;
 </script>
 
 <style scoped>

@@ -1,19 +1,20 @@
 <script setup>
 import { defineProps } from 'vue';
-
 defineProps({
   clown: {
     type: Object,
     required: true
   },
 });
+
+const BASE_URL = process.env.VUE_APP_API_BASE_URL;
 </script>
 
 <template>
   <div class="chef-card">
     <img 
       v-if="clown.image_name" 
-      :src="`http://localhost:8080/images/profile/${clown.image_name}`" 
+      :src="`${BASE_URL}/images/profile/${clown.image_name}`" 
       alt="chef image" 
       class="chef-image"
     />
