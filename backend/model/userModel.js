@@ -15,7 +15,7 @@ async function createUser(user) {
 
     await db.query(
       `INSERT INTO user_gallery (user_id) VALUES ($1)`,
-      [newUser.user_id] // use the PK from users
+      [newUser.user_id] 
     );
 
     return newUser;
@@ -40,7 +40,8 @@ async function getUserByEmail(email) {
             username:user.username, 
             email: user.email,
             password: user.password,
-            role: user.role
+            role: user.role,
+            is_verified: user.is_verified
         };
     } catch (error) {
         console.error('Error while getting user via email:', error);
@@ -202,6 +203,19 @@ async function checkEmailExists(email) {
   }
 }
 
+async function saveVerificationToken(user_id,token,expire) {
+  await db.query(`UPDATE users SET verification_token = $2, token_expires_at = $3 WHERE user_id = $1`, [user_id,token,expire])
+}
+
+async function verifyUserByToken(token) {
+  const result  = await db.query(
+    `UPDATE users SET is_verified = TRUE, verification_token = NULL, token_expires_at = NULL
+    WHERE verification_token = $1  AND is_verified = FALSE AND token_expires_at > NOW() RETURNING user_id`,[token])
+
+  return result.rows.length > 0;
+
+}
+
 
 
 module.exports = {
@@ -217,5 +231,7 @@ module.exports = {
     getTopChefs,
     getClowns,
     checkEmailExists,
-    checkUsernameExists
+    checkUsernameExists,
+    saveVerificationToken,
+    verifyUserByToken
 }

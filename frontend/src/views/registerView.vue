@@ -29,6 +29,7 @@
         const result = await registerUser(username.value,email.value,password.value);
         if(result) {
             message.value = result.message; 
+            alert('Kayıt başarılı! Lütfen e-posta adresine gönderilen doğrulama linkine tıkla.');
             router.push('/login')
         }
     }

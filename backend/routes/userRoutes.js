@@ -16,6 +16,8 @@ router.get('/top',userController.getTopChefs);
 
 router.get('/clowns',userController.getClowns);
 
+router.get('/verify-email', userController.verifyEmail);
+
 router.get('/info/:userId',authMiddleware,authorizeRoles('User','Admin'),userController.getUserInfoById);
 
 router.get('/:id/points',userController.getUserPoınts);

@@ -1,7 +1,9 @@
 const bcrypt = require('bcrypt');
 const userModel = require('../model/userModel');
 const generateToken = require('../utils/generateToken');
+const crypto = require('crypto')
 const { get } = require('../routes/userRoutes');
+const { sendVerificationEmail } = require('../utils/mail');
 
 async function registerUser(req,res) {
     const {email,password,username} = req.body;
@@ -17,17 +19,41 @@ async function registerUser(req,res) {
             return res.status(409).json({ message: 'Email is already registered.' });
         }
         const hashedPassword = await bcrypt.hash(password,10);
+
         const newUser = await userModel.createUser({
             username,
             email,
             password: hashedPassword
         });
-        res.status(201).json({message:'Registration Successful'});
+
+        const token = crypto.randomBytes(32).toString('hex');
+        const expire = new Date()
+        expire.setHours(expire.getHours() + 24);
+
+        await userModel.saveVerificationToken(newUser.user_id,token,expire);
+
+        await sendVerificationEmail(email,username,token);
+
+        return res.status(201).json({ message: 'Kayıt başarılı! Lütfen e-postanızı doğrulayın.' });
     } catch (error) {
         console.error('Registiration error:',error);
         res.status(500).json({message:'Server error'})
     }
 };
+
+async function verifyEmail(req,res) {
+    const {token} = req.query
+    try {
+        const success = await userModel.verifyUserByToken(token);
+        if(success) {
+            return res.redirect(`${process.env.FRONTEND_URL}/login?verified=true`);
+        }
+        res.status(400).send('Geçersiz veya süresi dolmuş link.');
+    } catch (error) {
+        console.log('Doğrulama hatası:',error)
+        res.status(500).send('Doğrulama hatası.');
+    }
+}
 
 async function loginUser(req,res) {
     try {
@@ -36,6 +62,10 @@ async function loginUser(req,res) {
         if(!user) return res.status(401).json({message:"Email or password wrong"});
         const isMatch = await bcrypt.compare(password, user.password);
         if(!isMatch) return res.status(401).json({message:"Email or password wrong"});
+        console.log(user.is_verified)
+        if (!user.is_verified) {
+            return res.status(401).json({ message: "Lütfen önce e-posta adresinizi doğrulayın." });
+        }
         console.log("User role from DB:", user.role,user.id,user.email);
         const token = generateToken({id:user.id, email:user.email, role:user.role});
         res.json({
@@ -245,5 +275,6 @@ module.exports = {
     getUserPoınts,
     adjustUserPoints,
     getTopChefs,
-    getClowns
+    getClowns,
+    verifyEmail
 }
