@@ -1,25 +1,25 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import LoginView from '@/views/loginView.vue'
-import RegisterView from '@/views/registerView.vue'
-import HomeView from '@/views/homeView.vue'
+import loginView from '@/views/loginView.vue'
+import registerView from '@/views/registerView.vue'
+import homeView from '@/views/homeView.vue'
 import mainLayout from '@/layouts/mainLayout.vue'
-import ProfileView from '@/views/profileView.vue'
-import RecipeView from '@/views/recipeView.vue'
-import SubmitRecipeView from '@/views/submitRecipeView.vue'
-import FavoritesView from '@/views/favoritesView.vue'
+import profileView from '@/views/profileView.vue'
+import recipeView from '@/views/recipeView.vue'
+import submitRecipeView from '@/views/submitRecipeView.vue'
+import favoritesView from '@/views/favoritesView.vue'
 import editRecipeView from '@/views/editRecipeView.vue'
-import ProfileEditView from '@/views/profileEditView.vue'
-import FindRecipeView from '@/views/findRecipeView.vue'
+import profileEditView from '@/views/profileEditView.vue'
+import findRecipeView from '@/views/findRecipeView.vue'
 const routes = [
   {
     path:'/login',
     name: 'Login',
-    component:LoginView
+    component:loginView
   },
   {
     path:'/register',
     name:'Register',
-    component:RegisterView
+    component:registerView
   },
   {
     path:'/',
@@ -28,14 +28,14 @@ const routes = [
     meta: { requiresAuth: true },
     children:[
       {path:'', redirect:'/home'},
-      {path:'home',name:'Home', component:HomeView},
-      {path:'profile/:userId', name:'Profile', component:ProfileView},
-      {path:'/recipe/:recipeId', name:'Recipe', component:RecipeView},
-      {path:'/submit-recipe', name:'SubmitRecipe', component:SubmitRecipeView},
-      {path:'/favorites',name:'Favorites', component:FavoritesView},
+      {path:'home',name:'Home', component:homeView},
+      {path:'profile/:userId', name:'Profile', component:profileView},
+      {path:'/recipe/:recipeId', name:'Recipe', component:recipeView},
+      {path:'/submit-recipe', name:'SubmitRecipe', component:submitRecipeView},
+      {path:'/favorites',name:'Favorites', component:favoritesView},
       {path:'/recipe/update/:recipe_id',name:'Update Recipe',component:editRecipeView},
-      {path:'/profile/update/:userId',name:'Update Profile', component:ProfileEditView},
-      {path:'/recipes/findRecipe',name:'Find recipe', component:FindRecipeView}
+      {path:'/profile/update/:userId',name:'Update Profile', component:profileEditView},
+      {path:'/recipes/findRecipe',name:'Find recipe', component:findRecipeView}
     ]
   }
 ]
