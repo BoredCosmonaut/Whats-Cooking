@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: process.env.VITE_BACKEND_URL,
+    baseURL: `https://whats-cooking-4ksv.onrender.com`,
     withCredentials:true
 });
 
