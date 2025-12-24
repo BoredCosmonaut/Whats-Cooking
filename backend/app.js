@@ -15,7 +15,7 @@ const reviewRoutes = require('./routes/reviewRoutes');
 app.use(cors({
     origin: [
         "http://localhost:8082", 
-        `http://localhost:8082`,
+        `http://localhost:8080`,
         "https://whats-cooking-seven.vercel.app"
     ],
     credentials: true,
