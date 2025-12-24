@@ -1,7 +1,7 @@
-const nodemailer = require(`nodemailer`)
+const nodemailer = require(`nodemailer`);
 
 const transporter = nodemailer.createTransport({
-    host: process.env.MAIL_HOST, 
+    host: process.env.MAIL_HOST || 'smtp.gmail.com', 
     port: 465, 
     secure: true, 
     auth: {
@@ -14,14 +14,14 @@ const transporter = nodemailer.createTransport({
     connectionTimeout: 10000 
 });
 
-const sendVerificationEmail = async(email,username,token) => {
+const sendVerificationEmail = (email, username, token) => {
     const verificationLink = `${process.env.BACKEND_URL}/api/users/verify-email?token=${token}`;
 
     const mailOptions = {
         from: `"Whats cooking" <${process.env.MAIL_USER}>`,
         to: email,
-        subject:`Verify Your Email`,
-        html:`
+        subject: `Verify Your Email`,
+        html: `
             <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #e8f5e9; padding: 20px;">
                 <h2 style="color: #1b5e20;">Hoş geldin, ${username}!</h2>
                 <p>Yemek tarifleri topluluğumuza katıldığın için mutluyuz. Devam etmek için lütfen hesabını doğrula:</p>
@@ -36,8 +36,17 @@ const sendVerificationEmail = async(email,username,token) => {
         `
     };
 
-    return transporter.sendMail(mailOptions)
+    // Buradaki Promise sarmalaması bağlantının kopmamasını sağlar
+    return new Promise((resolve, reject) => {
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error("Mail Error:", error);
+                return reject(error);
+            }
+            console.log("Mail Sent:", info.response);
+            resolve(info);
+        });
+    });
+};
 
-}
-
-module.exports = {sendVerificationEmail}
+module.exports = { sendVerificationEmail };
