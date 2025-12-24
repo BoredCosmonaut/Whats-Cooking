@@ -14,10 +14,11 @@ const reviewRoutes = require('./routes/reviewRoutes');
 
 app.use(cors({
     origin: [
-    "http://localhost:8082", 
-    "whats-cooking-seven.vercel.app" 
+        "http://localhost:8082", 
+        "https://whats-cooking-seven.vercel.app"
     ],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
