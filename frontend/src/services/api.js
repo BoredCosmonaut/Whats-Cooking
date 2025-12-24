@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: `https://whats-cooking-4ksv.onrender.com`,
+    baseURL: `https://whats-cooking-4ksv.onrender.com/api`,
     withCredentials:true
 });
 
