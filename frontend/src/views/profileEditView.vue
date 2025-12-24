@@ -13,7 +13,7 @@
     const imageFile = ref(null);
     const imageUrl = ref('')
     const user_id = route.params.userId;
-    const BASE_URL = process.env.VUE_APP_API_BASE_URL;
+    //const BASE_URL = process.env.VUE_APP_API_BASE_URL;
     watch(
         () => user.value,
         (val) => {
@@ -21,7 +21,7 @@
                 username.value = val.username || '';
                 email.value = val.email || '';
                 currentPassword.value = '';     
-                imageUrl.value = val.image_url ? `${BASE_URL}${val.image_url}` : '';
+                imageUrl.value = val.image_url || '';
             }
         },
         {immediate:true}
@@ -48,7 +48,10 @@
         const formData = new FormData()
         formData.append('image',imageFile.value);
         const res = await handleImageUpdate(user_id,formData)
-        if (res) alert('Profile picture updated!')
+        if (res){ 
+            alert('Profile picture updated!')
+            if (res.url) imageUrl.value = res.url;
+        }
     }
 
     async function submitPassword() {

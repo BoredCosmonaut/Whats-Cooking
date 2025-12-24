@@ -7,14 +7,15 @@ defineProps({
   },
 });
 
-const BASE_URL = process.env.VUE_APP_API_BASE_URL;
+//const BASE_URL = process.env.VUE_APP_API_BASE_URL;
+const SUPABASE_URL = process.env.VUE_APP_API_SUPABASE_URL;
 </script>
 
 <template>
   <div class="chef-card">
     <img 
       v-if="clown.image_name" 
-      :src="`${BASE_URL}/images/profile/${clown.image_name}`" 
+      :src="`${SUPABASE_URL}/images/profile/${clown.image_name}`" 
       alt="chef image" 
       class="chef-image"
     />

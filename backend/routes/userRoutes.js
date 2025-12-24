@@ -4,7 +4,7 @@ const userController = require('../controllers/userController');
 const authMiddleware = require('../middleware/authMiddleware');
 const authorizeRoles = require('../middleware/roleMiddleware');
 const rateLimiter = require('../middleware/rateLimiterMiddleware');
-const dynamicUpload = require('../middleware/dynamicUploadMiddleware')
+const {upload} = require('../middleware/dynamicUploadMiddleware')
 
 router.post('/register', rateLimiter.registerUserLimiter,userController.registerUser);
 
@@ -26,7 +26,7 @@ router.put('/profile/:id',authMiddleware,authorizeRoles('User','Admin'),rateLimi
 
 router.put('/updatePassword/:id', authMiddleware,authorizeRoles('User','Admin'),rateLimiter.generalRateLimiter,userController.updatePassword);
 
-router.put('/profileImage/update/:userId', authMiddleware,authorizeRoles('User','Admin'),dynamicUpload('profile').single('image'), userController.updateProfilePicture)
+router.put('/profileImage/update/:userId', authMiddleware,authorizeRoles('User','Admin'),upload.single('image'), userController.updateProfilePicture)
 
 
 module.exports = router;

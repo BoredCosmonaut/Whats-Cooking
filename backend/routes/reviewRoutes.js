@@ -6,7 +6,7 @@ const authorizeRoles = require('../middleware/roleMiddleware');
 const rateLimiter = require('../middleware/rateLimiterMiddleware');
 const dynamicUpload = require('../middleware/dynamicUploadMiddleware');
 
-router.post('/post/:id', authMiddleware, authorizeRoles('User','Admin'),dynamicUpload('reviews').single('image'),reviewController.createReview);
+router.post('/post/:id', authMiddleware, authorizeRoles('User','Admin'),dynamicUpload.upload.single('image'),reviewController.createReview);
 
 router.post('/report/:id', authMiddleware,authorizeRoles('User','Admin'),reviewController.reportReview);
 

@@ -4,7 +4,7 @@ const generateToken = require('../utils/generateToken');
 const crypto = require('crypto')
 const { get } = require('../routes/userRoutes');
 const { sendVerificationEmail } = require('../utils/mail');
-
+const {uploadToSupabase} = require(`../middleware/dynamicUploadMiddleware`)
 async function registerUser(req,res) {
     const {email,password,username} = req.body;
     try {
@@ -101,7 +101,7 @@ async function getUserInfoById(req,res) {
     }
 };
 
-async function updateProfilePicture(req,res) {
+`async function updateProfilePicture(req,res) {
     try {
         const user_id = parseInt(req.params['userId'], 10);
 
@@ -116,8 +116,35 @@ async function updateProfilePicture(req,res) {
 
 
         const image_name = req.file.filename;
-        const image_url = `/images/profile/${image_name}`;
+        
 
+        const updatedProfile = await userModel.updateProfilePicture(user_id,image_name,image_url);
+        
+        res.status(200).json({
+        message: "Profile picture updated successfully",
+        profile: updatedProfile,
+        });
+        
+    } catch (error) {
+        console.error('Error while updating the image:',error);
+        res.status(500).json({message:'Couldnt update profile image'});
+    }
+};`
+
+async function updateProfilePicture(req,res) {
+    try {
+        const user_id = parseInt(req.params['userId'], 10);
+
+        
+        if(user_id !== req.user.id &&  req.user.role !== 'Admin') {
+            return res.status(401).json({message:'You cant do that this is not your account'});
+        }
+        
+        if(!req.file){
+            return res.status(400).json({message:'No image uploaded'});
+        };
+
+        const { image_name, image_url } = await uploadToSupabase(req.file, 'profile');
         const updatedProfile = await userModel.updateProfilePicture(user_id,image_name,image_url);
         
         res.status(200).json({

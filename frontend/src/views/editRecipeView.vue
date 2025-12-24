@@ -19,6 +19,7 @@
     const imageFile = ref(null);
     const image_name = ref(null);
     const imageUrl = ref(null)
+    const SUPABASE_URL = process.env.VUE_APP_API_SUPABASE_URL;
     onMounted(async() => {
         const data = await getRecipeById(recipe_id);
         if(data) {
@@ -31,7 +32,7 @@
             steps.value = data.recipe.steps?.length ? data.recipe.steps.map(s => ({ description: s.description || s.instruction || '',step_number: s.step_number || 1})) : [{ description: '', step_number: 1 }];
             image_name.value = data.recipe.image_name
         }
-      imageUrl.value = `http://localhost:8080/images/recipes/${image_name.value}`  
+      imageUrl.value = `${SUPABASE_URL}/images/recipes/${image_name.value}`  
     })
 
     function addIngredient() {
@@ -264,6 +265,10 @@ textarea {
 .image-section {
   margin-top: 2rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .preview {

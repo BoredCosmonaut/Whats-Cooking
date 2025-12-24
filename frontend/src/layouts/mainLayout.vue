@@ -2,7 +2,7 @@
     <div class="main-layout">
         <div class="sidebar" v-if="user && user.info">
             <div class="info">
-                <img :src="`${BASE_URL}/images/profile/${user.info.image_name}`" alt="" class="user-image">
+                <img :src="`${SUPABASE_URL}/images/profile/${user.info.image_name}`" alt="" class="user-image">
                 <p class="username">{{ user.info.username }}</p>
                 <p class="points-badge">{{ user.points }} Points</p> 
             </div>
@@ -39,7 +39,8 @@
       }
     });
 
-const BASE_URL = process.env.VUE_APP_API_BASE_URL;
+//const BASE_URL = process.env.VUE_APP_API_BASE_URL;
+const SUPABASE_URL = process.env.VUE_APP_API_SUPABASE_URL;
 </script>
 
 <style scoped>

@@ -1,7 +1,7 @@
 const reviewModel = require('../model/reviewModel');
 const userModel = require('../model/userModel'); 
 const recipeModel = require('../model/recipeModel');
-
+const {uploadToSupabase} = require(`../middleware/dynamicUploadMiddleware`)
 async function createReview(req,res) {
     try {
         console.log('Review posted');
@@ -12,11 +12,11 @@ async function createReview(req,res) {
         const recipe = await recipeModel.getRecipeInfoById(recipe_id);
         const recipe_author_id = recipe.submitted_by;
 
-        if(req.file) {
-            const image_name = req.file.filename;
-            const image_url = `/images/reviews/${image_name}`;
-            await reviewModel.addReviewImage(review.review_id, image_name,image_url);
-        };
+        if (req.file) {
+            const { image_name, image_url } = await uploadToSupabase(req.file, 'reviews');
+
+            await reviewModel.addReviewImage(review.review_id, image_name, image_url);
+        }
 
         if(rating >= 3) {
             const points = 5;

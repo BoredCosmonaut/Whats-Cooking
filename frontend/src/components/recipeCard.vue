@@ -2,7 +2,7 @@
     <div class="recipe-card" :class="{'compact-mode': compact}">
         <div class="image-wrapper">
             <img 
-                :src="`${BASE_URL}/images/recipes/${recipe.image_name}`" 
+                :src="`${SUPABASE_URL}/images/recipes/${recipe.image_name}`" 
                 :alt="recipe.title" 
                 class="recipe-image"
             >
@@ -34,7 +34,8 @@ import { defineProps } from 'vue';
             default:false
         }
     })
-const BASE_URL = process.env.VUE_APP_API_BASE_URL;
+//const BASE_URL = process.env.VUE_APP_API_BASE_URL;
+const SUPABASE_URL = process.env.VUE_APP_API_SUPABASE_URL;
 </script>
 
 <style scoped>

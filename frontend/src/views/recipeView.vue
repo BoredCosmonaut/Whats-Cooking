@@ -17,7 +17,8 @@
       image: null,
     });
     const isFavorite = ref(false)
-
+    //const BASE_URL = process.env.VUE_APP_API_BASE_URL;
+    const SUPABASE_URL = process.env.VUE_APP_API_SUPABASE_URL;
     const loggedInUserId = parseInt(localStorage.getItem('userId'))
     const loggedInUserRole= (localStorage.getItem('role'))
     onMounted( async() => {
@@ -27,7 +28,6 @@
             if(recipe.value?.submitted_by) {
                 await fetchUser(recipe.value.submitted_by)
             }
-            
             const favorites = await getFavorites();
             console.log(favorites)
             isFavorite.value = favorites.some(fav => fav.recipe_id === parseInt(recipe_id));
@@ -107,7 +107,6 @@
     const sortedSteps = computed(() => {
       return recipe.value?.steps ? [...recipe.value.steps].sort((a,b) => a.step_number - b.step_number) : []
     })
-
 </script>
 
 <template>
@@ -121,7 +120,7 @@
             
             <div class="image-area">
                 <img v-if="recipe.image_name" 
-                    :src="`http://localhost:8080/images/recipes/${recipe.image_name}`" 
+                    :src="`${SUPABASE_URL}/images/recipes/${recipe.image_name}`" 
                     class="recipe-image"
                 >
                 <div class="recipe-actions">
@@ -150,7 +149,7 @@
                 <div class="submitted-by" v-if="user && user.info">
                     <p class="label">Submitted By:</p>
                     <img v-if="user.info.image_name" 
-                        :src="`http://localhost:8080/images/profile/${user.info.image_name}`" 
+                        :src="`${SUPABASE_URL}/images/profile/${user.info.image_name}`" 
                         class="user-image"
                     >
                     <p class="username">{{ user.info.username }}</p>

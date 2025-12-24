@@ -4,6 +4,7 @@ const fsPromises = require('fs').promises;
 const recipeModel = require('../model/recipeModel');
 const userModel = require('../model/userModel');
 const { error } = require('console');
+const {uploadToSupabase} = require(`../middleware/dynamicUploadMiddleware`)
 
 async function createRecipe(req, res) {
   try {
@@ -35,8 +36,8 @@ async function createRecipe(req, res) {
     let recipe_image;
 
     if (req.file) {
-      const image_name = req.file.filename;
-      const image_url = `/images/recipes/${image_name}`;
+      // 'recipes' klasörüne yükle ve URL al
+      const { image_name, image_url } = await uploadToSupabase(req.file, 'recipes');
       recipe_image = await recipeModel.addRecipeImage(recipe_id, image_url, image_name);
     }
 
@@ -154,21 +155,9 @@ async function updateRecipeImage(req,res) {
       return res.status(403).json({ message: "You can only update your own recipes" });
     }
 
-    const image_name = req.file.filename;
-    const image_url = `/images/recipes/${image_name}`;
+    const { image_name, image_url } = await uploadToSupabase(req.file, 'recipes');
 
-    const updated_image = await recipeModel.updateRecipeImage(recipe_id,image_url,image_name);
-    
-    if (recipe.image_name) {
-      console.log(recipe.image_name)
-      const filename = path.basename(recipe.image_name);
-
-      const oldImagePath = path.join(__dirname, '..', '..', 'images', 'recipes', filename);
-
-      fs.unlink(oldImagePath, (err) => {
-        if (err) console.error('Failed to delete old image:', err);
-      });
-    }
+    const updated_image = await recipeModel.updateRecipeImage(recipe_id, image_url, image_name);
 
     res.status(200).json({message:'Recipe image updated', image:updated_image});
 
