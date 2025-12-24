@@ -11,7 +11,6 @@ const transporter = nodemailer.createTransport({
     tls: {
         rejectUnauthorized: false
     },
-    connectionTimeout: 10000 
 });
 
 const sendVerificationEmail = (email, username, token) => {
@@ -36,7 +35,6 @@ const sendVerificationEmail = (email, username, token) => {
         `
     };
 
-    // Buradaki Promise sarmalaması bağlantının kopmamasını sağlar
     return new Promise((resolve, reject) => {
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
