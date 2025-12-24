@@ -13,7 +13,10 @@ const recipeRoutes = require('./routes/recipeRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 
 app.use(cors({
-    origin: 'http://localhost:8080',
+    origin: [
+    "http://localhost:8082", 
+    "whats-cooking-seven.vercel.app" 
+    ],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
