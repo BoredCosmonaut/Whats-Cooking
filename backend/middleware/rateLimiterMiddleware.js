@@ -2,19 +2,19 @@ const { memoryRateLimiter } = require('./createRateLimiterMiddleware');
 
 const loginRateLimiter = memoryRateLimiter({
     windowMs: 10 * 60 * 1000,
-    max: 4,
+    max: 40,
     keyGenerator: (req) => req.ip
 });
 
 const registerUserLimiter = memoryRateLimiter({
     windowMs: 10 * 60 * 1000, 
-    max: 3,                   
+    max: 30,                   
     keyGenerator: (req) => req.ip
 });
 
 const generalRateLimiter = memoryRateLimiter({
     windowMs: 10 * 60 * 1000, 
-    max: 5,                   
+    max: 50,                   
     keyGenerator: (req) => `${req.user.id}:${req.ip}` 
 });
 
