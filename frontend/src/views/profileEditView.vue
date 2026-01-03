@@ -85,9 +85,9 @@
             <section class="card">
                 <h2>General Info</h2>
                 <label>Username</label>
-                <input type="text" v-model="username">
+                <input type="text" v-model="username" maxlength="25">
                 <label>Email</label>
-                <input type="text" v-model="email">
+                <input type="text" v-model="email" maxlength="25">
                 <p v-if="error" class="error-message">{{ error }}</p>
                 <button @click="submitGeneralInfo" :disabled="isLoading">Update Info</button>
             </section>
@@ -96,7 +96,7 @@
                 <h2>Profile Picture</h2>
                 <img :src="imageUrl" class="profile-pic" alt="">
                 <input type="file" accept="image/*" @change="handleFileChange">
-                <button @click="submitProfileImage" :disabled="isLoading">Update Image</button>
+                <button @click="submitProfileImage" :disabled="isLoading && imageFile && imageFile.size >5*1024*1024" :class="{ 'disabled-btn': imageFile && imageFile.size > 5 * 1024 * 1024 }" >Update Image</button>
             </section>
 
             <section class="card">
@@ -104,7 +104,7 @@
                 <label>Current Password</label>
                 <input type="password" v-model="currentPassword">
                 <label>New Password</label>
-                <input type="password" v-model="newPassword">
+                <input type="password" v-model="newPassword" maxlength="25">
                 <p v-if="passwordError" class="error-message">{{ passwordError }}</p>
                 <button @click="submitPassword" :disabled="isLoading">Update Password</button>
             </section>
@@ -116,7 +116,7 @@
                 <li>**Username:** Must be unique. Changes might be limited.</li>
                 <li>**Email:** Used for account verification and password recovery.</li>
                 <li>**Passwords:** Choose a strong password (minimum 12 characters recommended).</li>
-                <li>**Image:** Max file size is 2MB. Use a square image for best display results.</li>
+                <li>**Image:** Max file size is 5MB. Use a square image for best display results.</li>
             </ul>
         </aside>
     </div>
@@ -275,5 +275,18 @@ button:disabled {
     text-align: left;
     font-weight: 600;
     margin-top: -0.5rem; 
+}
+
+.helper-text {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+  font-family: sans-serif;
+}
+
+.disabled-btn {
+  background-color: #e8f5e9 !important; 
+  color: #a5d6a7 !important;
+  cursor: not-allowed; 
 }
 </style>

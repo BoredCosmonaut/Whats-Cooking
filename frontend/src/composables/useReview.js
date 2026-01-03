@@ -62,7 +62,12 @@ export function useReview(){
     }
 
     async function postReview(recipe_id,reviewData) {
+        isLoading.value = true;
+        error.value = null;
         try {
+            if (reviewData.image && reviewData.image.size > 5 * 1024 * 1024) {
+                throw new Error("Görsel 5MB'dan büyük olamaz.");
+            }
             const formData = new FormData();
             formData.append('rating',reviewData.rating);
             formData.append('comment',reviewData.comment);
@@ -71,18 +76,24 @@ export function useReview(){
             const res = await postReviewApi(recipe_id,formData)
 
             return res;
-        } catch (error) {
-            console.error('Error posting review:', error);
+        } catch (err) {
+            console.error('Error posting review:', err);
+            throw err
+        } finally {
+            isLoading.value = false;
         }
     }
 
     async function reportReview(review_id,reason) {
+        isLoading.value = true;
         try {
             const res = await reportReviewApi(review_id,reason);
             
             return res
         } catch (error) {
             console.error('Error while reporting review:',error);
+        } finally {
+            isLoading.value = false
         }
     }
 

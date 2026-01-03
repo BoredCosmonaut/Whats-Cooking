@@ -13,6 +13,7 @@ export function useUser() {
     const clowns = ref([]);
     const passwordError = ref(null)
     async function restoreUser() {
+        error.value = null
         try {
             const user_id = localStorage.getItem("userId");
             const storedToken = localStorage.getItem("token");

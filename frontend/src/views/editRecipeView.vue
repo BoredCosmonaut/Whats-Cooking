@@ -2,7 +2,7 @@
     import {ref,onMounted} from 'vue'
     import { useRoute,useRouter } from 'vue-router';
     import { useRecipe } from '@/composables/useRecipe';
-
+    import { toast } from 'vue3-toastify';
     const route = useRoute();
     const router = useRouter();
 
@@ -83,22 +83,29 @@
 
         const res = await updateRecipe(recipe_id,payload);
         if(res) {
-            alert('Recipe Updated!')
+            toast.success('Recipe Updated!')
             router.push(`/recipe/${recipe_id}`)
         }
     }
 
     async function handleImageUpload() {
         if(!imageFile.value) {
-            alert('Please select an image first');
+            toast.warning('Please select an image first');
             return
         }
+
+        const maxSizeInBytes = 5*1024*1024
+        if(imageFile.value.size > maxSizeInBytes) {
+          toast.warning(`Image size too big`)
+          return
+        } 
+
         const formData = new FormData();
         formData.append('image',imageFile.value);
 
         const res = await updateRecipeImage(recipe_id,formData)
         if(res) {
-            alert('recipe image updated');
+            toast.success('recipe image updated');
         }
     }
 
@@ -110,21 +117,22 @@
             <section class="image-section">
             <h3>Update Image</h3>
             <input type="file" accept="image/*" @change="handleFileUpload" />
+            <p class="helper-text">Maksimum dosya boyutu: 5MB</p>
             <img v-if="imageUrl" :src="imageUrl" class="preview" />
-            <button @click="handleImageUpload" class="upload-btn">Upload New Image</button>
+            <button @click="handleImageUpload" class="upload-btn" :class="{ 'disabled-btn': imageFile && imageFile.size > 5 * 1024 * 1024 }" :disabled="imageFile && imageFile.size >5*1024*1024 ">Upload New Image</button>
             </section>
             <form class="form" @submit.prevent="handleUpdate">
                 <label>Title</label>
-                <input v-model="title" type="text" required />
+                <input v-model="title" type="text" required maxlength="100" />
 
                 <label>Description</label>
-                <input v-model="description" type="text" required />
+                <input v-model="description" type="text" required maxlength="100" />
 
                 <label>Category</label>
-                <input v-model="category" type="text" required />
+                <input v-model="category" type="text" required maxlength="15" />
 
                 <label>Cooking Time</label>
-                <input v-model="cooking_time" placeholder="e.g. 30 mins" required />
+                <input v-model="cooking_time" placeholder="e.g. 30 mins" required maxlength="10" />
 
                 <label>Difficulty</label>
                 <select v-model="difficulty" required>
@@ -141,8 +149,8 @@
                     :key="i" 
                     class="ingredient-row"
                   >
-                    <input v-model="ing.name" placeholder="Ingredient" type="text" required />
-                    <input v-model="ing.quantity" placeholder="Quantity" type="text" required />
+                    <input v-model="ing.name" placeholder="Ingredient" type="text" required maxlength="100" />
+                    <input v-model="ing.quantity" placeholder="Quantity" type="text" required maxlength="100"/>
                     <button 
                       type="button" 
                       class="remove-btn" 
@@ -173,7 +181,7 @@
                     <textarea 
                       v-model="step.description" 
                       placeholder="Describe step..." 
-                      required
+                      required maxlength="250"
                     ></textarea>
                     <button 
                       type="button" 
@@ -267,12 +275,16 @@ textarea {
   text-align: center;
   display: flex;
   flex-direction: column;
+  width: 50%;
   align-items: center;
   justify-content: center;
+  margin: auto;
 }
 
 .preview {
-  width: 200px;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
   border-radius: 8px;
   margin-top: 1rem;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -282,5 +294,18 @@ textarea {
   color: red;
   margin-top: 1rem;
   text-align: center;
+}
+
+.helper-text {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+  font-family: sans-serif;
+}
+
+.disabled-btn {
+  background-color: #e8f5e9 !important; 
+  color: #a5d6a7 !important;
+  cursor: not-allowed; 
 }
 </style>

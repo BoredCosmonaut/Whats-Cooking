@@ -58,7 +58,7 @@ export function useRecipe() {
     }
 
     async function submitRecipe(formData) {
-        isLoading.value = false;
+        isLoading.value = true;
         error.value = null;
         try {
             const data = await submitRecipeApi(formData);
@@ -66,12 +66,12 @@ export function useRecipe() {
         } catch(error) {
             error.value = error.response?.data?.message || 'Failed to submit recipe';
         } finally {
-            isLoading.value = true;
+            isLoading.value = false;
         }
     }
 
     async function deleteRecipe(recipe_id) {
-        isLoading.value = false;
+        isLoading.value = true;
         error.value = null;
         try {
             const data = await deleteRecipeApi(recipe_id);
@@ -79,27 +79,33 @@ export function useRecipe() {
         } catch(error) {
             error.value = error.response?.data?.message || 'Failed to delete recipe';
         } finally {
-            isLoading.value = true;
+            isLoading.value = false;
         }
     }
 
     async function addFavoriteRecipe(recipe_id) {
+        isLoading.value = true;
         error.value = null;
         try {
             const data = await favoriteRecipeApi(recipe_id)
             return data;
         } catch (error) {
             error.value = error.response?.data?.message || 'Failed to add recipe to favs';
+        } finally {
+            isLoading.value = false
         }
     }
 
     async function removeFavoriteRecipe(recipe_id) {
+        isLoading.value = true;
         error.value = null;
         try {
             const data = await removeFavoriteApi(recipe_id)
             return data
         } catch (error) {
             error.value = error.response?.data?.message || 'Failed to remove recipe to favs';
+        } finally {
+            isLoading.value = false
         }
     }
 

@@ -2,7 +2,7 @@
     import { computed,onMounted, ref} from 'vue'
     import { useRecipe } from '@/composables/useRecipe';
     import recipeCard from '@/components/recipeCard.vue';
-
+    import { toast } from 'vue3-toastify';
     const {searchRecipesApi,getAllIngredients,isLoading} = useRecipe()
     const selectedIngredients = ref([])
     const searchResults = ref([]);
@@ -39,7 +39,7 @@
 
     async function searchRecipes() {
         if(!selectedIngredients.value || selectedIngredients.value.length === 0) {
-            alert('Please select at least one ingredient');
+            toast.warning('Please select at least one ingredient');
             return;
         }
         const res = await searchRecipesApi({ ingredients: selectedIngredients.value });

@@ -28,9 +28,18 @@
     });
 
 
-    function handleFileUpload(e) {
-        image.value = e.target.files[0];
+function handleFileUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+        alert("Dosya çok büyük! Lütfen 5MB'den küçük bir görsel seçin.");
+        e.target.value = ''; 
+        image.value = null;  
+        return;
     }
+    image.value = file;
+}
 
     function addIngredient() {
         ingredients.value.push({name:'',quantity:''});
@@ -69,10 +78,10 @@
 
         <form class="form" @submit.prevent="handleSubmit">
             <label>Title</label>
-            <input v-model="title" placeholder="Recipe title" type="text" required>
+            <input v-model="title" placeholder="Recipe title" type="text" required maxlength="100">
 
             <label>Description</label>
-            <input v-model="description" placeholder="Recipe Description" type="text" required>
+            <input v-model="description" placeholder="Recipe Description" type="text" required maxlength="250">
 
             <label>Category</label>
             <input v-model="category" placeholder="e.g. Italian, Dessert..." required />
@@ -91,8 +100,8 @@
             <section class="ingredients">
                 <h3>Ingredients</h3>
                 <div v-for="(ing, i) in ingredients" :key="i" class="ingredients">
-                    <input v-model="ing.name" placeholder="Ingredient"   type="text">
-                    <input v-model="ing.quantity" placeholder="Quantity"  type="text">
+                    <input v-model="ing.name" placeholder="Ingredient"   type="text" required maxlength="100">
+                    <input v-model="ing.quantity" placeholder="Quantity"  type="text" required maxlength="100">
                 </div>
                 <button 
                   type="button" 
@@ -107,7 +116,7 @@
             <section class="steps">
                 <h3>Steps</h3>
                 <div v-for="(step, i) in steps" :key="i" class="steps">
-                    <textarea  v-model="steps[i]" placeholder="Describe step.."></textarea>
+                    <textarea  v-model="steps[i]" placeholder="Describe step.." required maxlength="250"></textarea>
                 </div>
                 <button 
                     type="button" 
@@ -120,7 +129,8 @@
             </section>
             
             <label>Upload Image</label>
-            <input type="file" accept="image/*" @change="handleFileUpload">
+            <p class="helper-text">Maksimum dosya boyutu: 5MB</p>
+            <input type="file" accept="image/*" @change="handleFileUpload" max="5mb" required="true">
             <img
             v-if="imageUrl"
             :src="imageUrl"
@@ -147,13 +157,13 @@
 */
 
 .submit-recipe {
-    max-width: 750px; /* Slightly narrower for focus */
+    max-width: 750px;
     margin: 2rem auto;
     background: #FFFFFF;
-    padding: 2.5rem; /* More spacious padding */
+    padding: 2.5rem; 
     border-radius: 6px;
-    border: 2px solid #E8F5E9; /* Light, clean border */
-    box-shadow: none; /* Removing heavy shadow */
+    border: 2px solid #E8F5E9; 
+    box-shadow: none; 
 }
 
 .title {
@@ -165,13 +175,13 @@
 
 .form label {
     display: block;
-    margin-top: 1.5rem; /* Increased vertical separation */
+    margin-top: 1.5rem; 
     margin-bottom: 0.2rem;
     font-weight: 700;
     color: #1B5E20;
 }
 
-/* General Inputs (Text, Select, Textarea) */
+
 input[type="text"], input[type="file"], select, textarea {
     width: 100%;
     margin-top: 0.25rem;
@@ -184,7 +194,7 @@ input[type="text"], input[type="file"], select, textarea {
 
 input[type="text"]:focus, select:focus, textarea:focus {
     border-color: #4CAF50;
-    box-shadow: 0 0 0 2px #E8F5E9; /* Subtle green focus ring */
+    box-shadow: 0 0 0 2px #E8F5E9; 
     outline: none;
 }
 
@@ -193,7 +203,6 @@ textarea {
     min-height: 80px;
 }
 
-/* --- Ingredients and Steps Sections --- */
 .ingredients, .steps {
     margin-top: 2rem;
     padding-top: 1rem;
@@ -207,29 +216,28 @@ textarea {
     border-bottom: none;
 }
 
-/* Dynamic Ingredient Fields (The repeating input groups) */
+
 .ingredients .ingredients {
     display: flex;
     gap: 1rem;
-    margin-bottom: 0.75rem; /* Space between ingredient rows */
+    margin-bottom: 0.75rem;
 }
 
 .ingredients input {
-    flex: 1; /* Equal width for Name and Quantity */
+    flex: 1; 
     padding: 0.6rem;
 }
 
-/* Dynamic Step Fields (The repeating textarea groups) */
 .steps .steps {
-    margin-bottom: 0.75rem; /* Space between step rows */
+    margin-bottom: 0.75rem; 
 }
 
-/* --- Add Button (Light/Subtle) --- */
+
 .add-btn {
     align-self: flex-start;
     margin-top: 0.5rem;
-    background: #E8F5E9; /* Very Light Green background */
-    color: #1B5E20; /* Dark Green text */
+    background: #E8F5E9; 
+    color: #1B5E20;
     border: 1px solid #A5D6A7;
     border-radius: 4px;
     padding: 0.5rem 1.2rem;
@@ -250,10 +258,10 @@ textarea {
     border-color: #E0E0E0;
 }
 
-/* --- Submit Button (Primary Green) --- */
+
 .submit-btn {
     margin-top: 2rem;
-    background: #4CAF50; /* Primary Green */
+    background: #4CAF50; 
     color: white;
     border: none;
     border-radius: 6px;
@@ -266,7 +274,7 @@ textarea {
 }
 
 .submit-btn:hover:not(:disabled) {
-    background: #1B5E20; /* Dark Green Hover */
+    background: #1B5E20; 
 }
 
 .submit-btn:disabled {
@@ -274,20 +282,26 @@ textarea {
     cursor: not-allowed;
 }
 
-/* --- Image Preview --- */
 .preview {
     margin-top: 1rem;
     max-width: 100%;
     max-height: 300px;
-    object-fit: contain; /* Ensures the whole image is seen */
+    object-fit: contain; 
     border-radius: 4px;
     border: 1px solid #E0E0E0;
     box-shadow: none;
 }
 
 .error {
-    color: #ff4d4f; /* Soft red for errors */
+    color: #ff4d4f;
     text-align: center;
     margin-top: 1rem;
+}
+
+.helper-text {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+  font-family: sans-serif;
 }
 </style>

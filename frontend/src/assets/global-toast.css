@@ -1,0 +1,89 @@
+/* --- GLOBAL TOAST STYLES --- */
+
+/* 1. Ana Toast Kutusu (Genel Görünüm) */
+.Toastify__toast {
+  border-radius: 12px !important;
+  font-family: 'Inter', sans-serif !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  padding: 12px 16px !important;
+}
+
+/* 2. Başarı (Success) Bildirimi - Senin Yeşilin */
+.Toastify__toast--success {
+  background-color: #E8F5E9 !important; /* Çok açık yeşil */
+  color: #1B5E20 !important; /* Koyu yeşil yazı */
+  border: 1px solid #A5D6A7 !important;
+}
+
+.Toastify__progress-bar--success {
+  background: #4CAF50 !important;
+}
+
+/* 3. Hata (Error) Bildirimi */
+.Toastify__toast--error {
+  background-color: #FFEBEE !important;
+  color: #B71C1C !important;
+  border: 1px solid #FFCDD2 !important;
+}
+
+/* 4. Onay Kutusu (Delete Confirmation) Özel Tasarımı */
+.toast-confirm-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 0;
+}
+
+.toast-text {
+  font-size: 15px !important;
+  color: #1B5E20 !important;
+  font-weight: 600 !important;
+  margin: 0 !important;
+  text-align: center;
+}
+
+.toast-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  justify-content: center;
+}
+
+/* Evet / Sil Butonu */
+.toast-btn-yes {
+  background-color: #4CAF50 !important; /* Onay butonu yeşil */
+  color: white !important;
+  border: none !important;
+  padding: 6px 20px !important;
+  border-radius: 6px !important;
+  font-weight: 700 !important;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+/* Vazgeç Butonu */
+.toast-btn-no {
+  background-color: #F5F5F5 !important;
+  color: #666 !important;
+  border: 1px solid #E0E0E0 !important;
+  padding: 6px 20px !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  cursor: pointer;
+}
+
+.toast-btn-yes:hover {
+  transform: scale(1.05);
+  background-color: #388E3C !important;
+}
+
+.toast-btn-no:hover {
+  background-color: #EEEEEE !important;
+}
+
+/* Kapatma Butonu (X) Rengi */
+.Toastify__close-button {
+  color: #1B5E20 !important;
+  opacity: 0.5;
+}

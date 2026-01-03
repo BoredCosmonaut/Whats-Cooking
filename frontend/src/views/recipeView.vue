@@ -6,6 +6,8 @@
     import { useReview } from '@/composables/useReview';
     import reviewCard from '@/components/reviewCard.vue';
     import router from '@/router';
+    import { toast } from 'vue3-toastify';
+    import { h } from 'vue'; 
     const route = useRoute()
     const {recipe,isLoading,error,getRecipeById,deleteRecipe,addFavoriteRecipe,removeFavoriteRecipe,getFavorites} = useRecipe()
     const {user,fetchUser} = useUser();
@@ -42,16 +44,16 @@
     async function  handleSubmitReview() {
       try {
         if(!newReview.value.rating && !newReview.value.comment && !newReview.value.image) {
-          alert('Please fill in both rating and comment.');
+          toast.warning('Lütfen puan, yorum ve görsel alanlarını doldurun.');
           return;
         }
 
         await postReview(recipe_id,newReview.value);
         await getReviewsForRecipe(recipe_id);
-        alert('✅ Review added successfully!');
+        toast.success('Yorumunuz başarıyla eklendi! ⭐');
         newReview.value = { rating: '', comment: '', image: null };
       } catch (error) {
-        alert('❌ Failed to post review.');
+        toast.error('Yorum gönderilirken bir hata oluştu.');
       }
     }
 
@@ -78,27 +80,68 @@
         if(isFavorite.value) {
           await removeFavoriteRecipe(recipe_id);
           isFavorite.value = false;
-          alert('Removed from favorites')
+          toast.info('Favorilerden çıkarıldı 💔');
         } else{
           await addFavoriteRecipe(recipe_id);
           isFavorite.value = true;
-          alert('Added to favorites')
+          toast.success('Favorilere eklendi! ❤️');
         }
       } catch (error) {
-        alert('❌ Failed to update favorites');
+        toast.error('Favori işlemi başarısız oldu.');
       }
     }
 
-    async function handleDeleteRecipe() {
+`    async function handleDeleteRecipe() {
       if (!confirm('Are you sure you want to delete this recipe? This action cannot be undone.')) return;
       try {
         await deleteRecipe(recipe_id);
-        alert('Recipe deleted!');
+        toast.success('Recipe deleted!');
         router.push('/');
       } catch (error) {
-        alert('❌ Failed to delete recipe.');
+        toast.error('❌ Failed to delete recipe.');
       }
     }
+`
+
+async function handleDeleteRecipe() {
+  toast.info(
+    ({ closeToast }) => 
+      h('div', { class: 'toast-confirm-container' }, [
+        h('p', { class: 'toast-text' }, 'Bu tarifi silmek istediğinize emin misiniz?'),
+        h('div', { class: 'toast-actions' }, [
+          h('button', { 
+            class: 'toast-btn-yes', 
+            onClick: async () => {
+              closeToast();
+              await proceedDelete();
+            } 
+          }, 'Evet, Sil'),
+          h('button', { 
+            class: 'toast-btn-no', 
+            onClick: closeToast 
+          }, 'Vazgeç')
+        ])
+      ]),
+    {
+      position: 'top-center',
+      autoClose: false,
+      closeOnClick: false,
+      draggable: false,
+      icon: false
+    }
+  );
+}
+
+// proceedDelete fonksiyonu aynı kalıyor
+async function proceedDelete() {
+  try {
+    await deleteRecipe(recipe_id);
+    toast.success('Tarif başarıyla silindi 🌿');
+    router.push('/');
+  } catch (error) {
+    toast.error('Silme işlemi başarısız oldu.');
+  }
+}
 
     function handleUpdateRecipe() {
       router.push(`/recipe/update/${recipe_id}`)
@@ -203,15 +246,15 @@
 
             <div class="form-group">
                 <label for="comment">Comment:</label>
-                <textarea id="comment" v-model="newReview.comment" required placeholder="Write your review..." class="input-field"></textarea>
+                <textarea id="comment" v-model="newReview.comment" required placeholder="Write your review..." class="input-field" maxlength="100"></textarea>
             </div>
 
             <div class="form-group">
-                <label>Image (optional):</label>
-                <input type="file" accept="image/*" @change="e => newReview.image = e.target.files[0]" class="input-field file-input" />
+                <label>Image:</label>
+                <input type="file" accept="image/*" @change="e => newReview.image = e.target.files[0]" class="input-field file-input"  required/>
             </div>
-
-            <button type="submit" class="submit-btn">Submit Review</button>
+            <p class="helper-text">Maksimum dosya boyutu: 5MB</p>
+            <button type="submit" class="submit-btn" :disabled="isLoading || (newReview.image && newReview.image.size >5*1024*1024) " :class="{ 'disabled-btn': newReview.image && newReview.image.size > 5*1024*1024 }">Submit Review</button>
         </form>
     </section>
 
@@ -237,7 +280,6 @@
 #E0E0E0 - Light Gray
 #FFFFFF - White
 */
-
 
 .main {
     max-width: 1000px; 
@@ -492,6 +534,7 @@ textarea.input-field {
     gap: 2.5rem; 
     justify-content: center;
 }
+
 
 @media (max-width: 768px) {
     .header-content {

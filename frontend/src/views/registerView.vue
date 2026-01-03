@@ -17,7 +17,7 @@
     import { ref } from 'vue';
     import { useRouter } from 'vue-router';
     import { useAuth } from '@/composables/useAuth';
-
+    import { toast } from 'vue3-toastify';
     const username = ref('');
     const password = ref('');
     const email = ref('');
@@ -29,7 +29,7 @@
         const result = await registerUser(username.value,email.value,password.value);
         if(result) {
             message.value = result.message; 
-            alert('Kayıt başarılı! Lütfen e-posta adresine gönderilen doğrulama linkine tıkla.');
+            toast.success('Kayıt başarılı! Lütfen e-posta adresine gönderilen doğrulama linkine tıkla.');
             router.push('/login')
         }
     }
