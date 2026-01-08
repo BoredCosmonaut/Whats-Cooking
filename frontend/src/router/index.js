@@ -10,6 +10,7 @@ import favoritesView from '@/views/favoritesView.vue'
 import editRecipeView from '@/views/editRecipeView.vue'
 import profileEditView from '@/views/profileEditView.vue'
 import findRecipeView from '@/views/findRecipeView.vue'
+import { toast } from 'vue3-toastify';
 const routes = [
   {
     path:'/login',
@@ -48,14 +49,24 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const isAuth = !!localStorage.getItem('token');
+  const loggedInUserId = localStorage.getItem('userId')
   console.log('Navigating to:', to.fullPath, 'Auth?', isAuth);
 
-  if (to.matched.some(record => record.meta.requiresAuth) && !isAuth) {
-    console.log('Blocked, redirecting to login...');
-    next('/login');
-  } else {
-    next();
+  if(to.matched.some(record => record.meta.requiresAuth) && !isAuth) {
+    next(`/login`)
+    return
   }
+
+  if(to.name === `Update Profile`) {
+    const profileIdInPath = to.params.userId
+
+    if(loggedInUserId != profileIdInPath) {
+      toast.warning(`Yetkisiz profil düzenleme girişimi!`)
+      next(`/home`)
+      return
+    }
+  }
+  next()
 });
 
 

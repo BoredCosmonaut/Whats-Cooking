@@ -84,6 +84,7 @@ async function getRecipeInfoById(id) {
                             SELECT 
                                 r.*,
                                 u.username AS submitted_by_username,
+                                ug.image_url,ug.image_name as user_image_name,
                                 r.submitted_by,
                                 ri.image_name,
                                 (
@@ -104,10 +105,14 @@ async function getRecipeInfoById(id) {
                                 FROM recipe_steps rs
                                 WHERE rs.recipe_id = r.recipe_id
                                 ) AS steps
-                            FROM recipes r
-                            LEFT JOIN users u ON r.submitted_by = u.user_id
-                            LEFT JOIN recipe_gallery ri ON r.recipe_id = ri.recipe_id
-                            WHERE r.recipe_id = $1;`,[id]);
+                                FROM recipes r
+                                LEFT JOIN users u 
+                                    ON r.submitted_by = u.user_id
+                                LEFT JOIN user_gallery ug 
+                                    ON u.user_id = ug.user_id
+                                LEFT JOIN recipe_gallery ri 
+                                    ON r.recipe_id = ri.recipe_id
+                             WHERE r.recipe_id = $1;`,[id]);
         return result.rows[0];
     } catch (error) {
         console.error('Error while getting recipe:',error);
@@ -120,6 +125,7 @@ async function getAllRecipes() {
       SELECT 
         r.*,
         u.username AS submitted_by_username,
+        ug.image_url,ug.image_name as user_image_name,
         ri.image_name,
         json_agg(DISTINCT jsonb_build_object(
           'ingredient_id', i.ingredient_id,
@@ -136,10 +142,11 @@ async function getAllRecipes() {
         ) AS steps
       FROM recipes r
       LEFT JOIN users u ON r.submitted_by = u.user_id
+      LEFT JOIN user_gallery ug ON u.user_id = ug.user_id
       LEFT JOIN recipe_gallery ri ON r.recipe_id = ri.recipe_id
       LEFT JOIN recipe_ingredients riq ON r.recipe_id = riq.recipe_id
       LEFT JOIN ingredients i ON riq.ingredient_id = i.ingredient_id
-      GROUP BY r.recipe_id, r.title, r.description, r.submitted_by, u.username, ri.image_name
+      GROUP BY r.recipe_id, r.title, r.description, r.submitted_by, u.username, ri.image_name,ug.image_url,ug.image_name
       ORDER BY r.recipe_id DESC;
     `);
 
@@ -267,12 +274,15 @@ async function removeFavoriteRecipe(user_id,recipe_id) {
 async function getUserFavorites(user_id) {
   try {
     const result = await db.query(`
-      SELECT r.*, COALESCE(MIN(rg.image_name), '') AS image_name
-      FROM favorites f
-      JOIN recipes r ON f.recipe_id = r.recipe_id
-      LEFT JOIN recipe_gallery rg ON r.recipe_id = rg.recipe_id
-      WHERE f.user_id = $1
-      GROUP BY r.recipe_id
+        SELECT r.*, COALESCE(MIN(rg.image_name), '') AS image_name,
+        ug.image_name as user_image_name
+        FROM favorites f
+        JOIN recipes r ON f.recipe_id = r.recipe_id
+        LEFT JOIN users u ON r.submitted_by = u.user_id
+        LEFT JOIN user_gallery ug ON u.user_id = ug.user_id
+        LEFT JOIN recipe_gallery rg ON r.recipe_id = rg.recipe_id
+        WHERE f.user_id = $1
+        GROUP BY r.recipe_id, ug.image_name
     `, [user_id]);
 
     return result.rows || [];
@@ -315,6 +325,7 @@ async function getUserRecipes(user_id) {
                             SELECT 
                                 r.*,
                                 u.username AS submitted_by_username,
+                                ug.image_url,ug.image_name as user_image_name,
                                 r.submitted_by,
                                 ri.image_name,
                                 (
@@ -337,6 +348,7 @@ async function getUserRecipes(user_id) {
                                 ) AS steps
                             FROM recipes r
                             LEFT JOIN users u ON r.submitted_by = u.user_id
+                            LEFT JOIN user_gallery ug ON u.user_id = ug.user_id
                             LEFT JOIN recipe_gallery ri ON r.recipe_id = ri.recipe_id
                             WHERE r.submitted_by = $1;`,[user_id])
         return result.rows

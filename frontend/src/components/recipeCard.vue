@@ -16,8 +16,10 @@
                 <p class="difficulty"><span class="label">Difficulty:</span> {{ recipe.difficulty }}</p>
                 <p class="category"><span class="label">Category:</span> {{ recipe.category }}</p>
             </div>
-            
-            <p class="submitted-by">Chef **{{ recipe.submitted_by_username }}**</p>
+            <div class="submitted-by">
+                <img :src="`${SUPABASE_URL}/images/profile/${recipe.user_image_name}`" alt="" class="user-image">
+                <span>Chef <strong>{{ recipe.submitted_by_username }}</strong></span>
+            </div>
         </div>
     </div>
 </template>
@@ -143,5 +145,30 @@ const SUPABASE_URL = process.env.VUE_APP_API_SUPABASE_URL;
 
 .recipe-card.compact-mode .submitted-by {
     padding-top: 0.25rem;
+}
+
+.submitted-by {
+    font-size: 0.9rem;
+    margin-top: auto; 
+    padding-top: 0.8rem; /* Çizgi ile arayı biraz açtık */
+    border-top: 1px dashed #E0E0E0;
+    color: #666; /* "Chef" yazısı için daha sade bir gri */
+    text-align: left; 
+    display: flex; /* Resim ve metni yan yana getirmek için */
+    align-items: center; /* Dikeyde ortalamak için */
+    gap: 8px; /* Resim ve metin arasındaki boşluk */
+}
+
+.user-image {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%; /* Tam yuvarlak */
+    object-fit: cover;
+    border: 1px solid #E8F5E9; /* Çok hafif yeşil çerçeve */
+}
+
+.submitted-by strong {
+    color: #1B5E20; /* Sadece kullanıcı adı senin koyu yeşilin */
+    font-weight: 600;
 }
 </style>

@@ -23,7 +23,8 @@ async function registerUser(req,res) {
         const newUser = await userModel.createUser({
             username,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            is_verified: true
         });
 
         const token = crypto.randomBytes(32).toString('hex');
@@ -31,8 +32,6 @@ async function registerUser(req,res) {
         expire.setHours(expire.getHours() + 24);
 
         await userModel.saveVerificationToken(newUser.user_id,token,expire);
-
-        await sendVerificationEmail(email,username,token);
 
         return res.status(201).json({ message: 'Kayıt başarılı! Lütfen e-postanızı doğrulayın.' });
     } catch (error) {
@@ -63,9 +62,9 @@ async function loginUser(req,res) {
         const isMatch = await bcrypt.compare(password, user.password);
         if(!isMatch) return res.status(401).json({message:"Email or password wrong"});
         console.log(user.is_verified)
-        if (!user.is_verified) {
-            return res.status(401).json({ message: "Lütfen önce e-posta adresinizi doğrulayın." });
-        }
+        // if (!user.is_verified) {
+        //     return res.status(401).json({ message: "Lütfen önce e-posta adresinizi doğrulayın." });
+        // }
         console.log("User role from DB:", user.role,user.id,user.email);
         const token = generateToken({id:user.id, email:user.email, role:user.role});
         res.json({

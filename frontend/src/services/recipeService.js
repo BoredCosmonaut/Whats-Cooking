@@ -2,6 +2,7 @@ import api from "./api";
 
 export async function getAllRecipes() {
     const result = await api.get(`/recipes/recipes`);
+    console.log(result)
     return result.data;   
 }
 
