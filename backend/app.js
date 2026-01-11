@@ -4,15 +4,13 @@ const path = require('path');
 const cors = require('cors');
 
 const app = express();
-
-app.set('trust proxy', 1);
 app.use(express.json({limit:'10mb'}));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use(cors({
     origin: [
         "http://localhost:8082", 
-        "http://localhost:8080",
+        `http://localhost:8080`,
         "https://whats-cooking-seven.vercel.app"
     ],
     credentials: true,
@@ -20,15 +18,17 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use('/images', express.static(path.join(__dirname, '..', 'images')));
+
 
 const userRoutes = require('./routes/userRoutes');
 const recipeRoutes = require('./routes/recipeRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 
+app.use('/images', express.static(path.join(__dirname, '..', 'images')));
+
 app.use('/api/users', userRoutes);
 app.use('/api/recipes', recipeRoutes);
-app.use('/api/reviews', reviewRoutes);
+app.use('/api/reviews',reviewRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
