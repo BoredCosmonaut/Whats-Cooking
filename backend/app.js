@@ -4,13 +4,9 @@ const path = require('path');
 const cors = require('cors');
 
 const app = express();
-app.use(express.json({limit:'10mb'}));
+app.set('trust proxy', 1);
+app.use(express.json({limit:'5mb'}));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-
-const userRoutes = require('./routes/userRoutes');
-const recipeRoutes = require('./routes/recipeRoutes');
-const reviewRoutes = require('./routes/reviewRoutes');
 
 app.use(cors({
     origin: [
@@ -22,6 +18,13 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+
+
+const userRoutes = require('./routes/userRoutes');
+const recipeRoutes = require('./routes/recipeRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+
 
 
 
