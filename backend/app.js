@@ -7,6 +7,11 @@ const app = express();
 app.use(express.json({limit:'10mb'}));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+
+const userRoutes = require('./routes/userRoutes');
+const recipeRoutes = require('./routes/recipeRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+
 app.use(cors({
     origin: [
         "http://localhost:8082", 
@@ -19,10 +24,6 @@ app.use(cors({
 }));
 
 
-
-const userRoutes = require('./routes/userRoutes');
-const recipeRoutes = require('./routes/recipeRoutes');
-const reviewRoutes = require('./routes/reviewRoutes');
 
 app.use('/images', express.static(path.join(__dirname, '..', 'images')));
 
