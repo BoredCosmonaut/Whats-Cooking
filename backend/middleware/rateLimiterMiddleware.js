@@ -20,7 +20,6 @@ const generalRateLimiter = memoryRateLimiter({
     windowMs: 10 * 60 * 1000, 
     max: 100, // Genel limit biraz daha esnek olabilir
     keyGenerator: (req) => {
-        // Eğer kullanıcı login ise ID'sini, değilse IP'sini kullan
         const userId = req.user ? req.user.id : 'anonymous';
         return `${userId}:${getClientIp(req)}`;
     }

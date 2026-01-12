@@ -5,7 +5,16 @@ const crypto = require('crypto')
 const { get } = require('../routes/userRoutes');
 const { sendVerificationEmail } = require('../utils/mail');
 const {uploadToSupabase} = require(`../middleware/dynamicUploadMiddleware`)
+const {validationResult} = require('express-validator')
 async function registerUser(req,res) {
+    
+    const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        return res.status(400).json({
+            message:errors.array()[0].msg
+        });
+    }
+    
     const {email,password,username} = req.body;
     try {
         const usernameExists = await userModel.checkUsernameExists(username);
