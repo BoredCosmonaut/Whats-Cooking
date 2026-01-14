@@ -10,21 +10,59 @@ const dynamicUpload = require('../middleware/dynamicUploadMiddleware')
 
 const recipeValidations = {
     saveRecipe: [
-        body('title').trim().notEmpty().withMessage('Title is required ')
-            .isLength({ max: 100 }).withMessage('Title too long'),
-        body('description').trim().notEmpty().withMessage('Description is required')
-            .isLength({ max: 100 }).withMessage('Description should be concise'),
-        body('category').isLength(min:7,max:25).trim().notEmpty().withMessage('Please select a category'),
-        body('cooking_time').trim().notEmpty().isInt().withMessage('Cooking time is required and should only be a number'),
-        body('difficulty').isIn(['Easy', 'Medium', 'Hard']).withMessage('Invalid difficulty level'),
-        body('ingredients').custom((value) => {
+        body('title')
+            .trim()
+            .notEmpty().withMessage('Title is required')
+            .isLength({ max: 100 }).withMessage('Title too long')
+            .matches(/^[a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s\-\,\.\!\'\?]+$/)
+            .withMessage('Title contains invalid characters '),
+
+        body('description')
+            .trim()
+            .notEmpty().withMessage('Description is required')
+            .isLength({ max: 100 }).withMessage('Description should be concise')
+            .matches(/^[a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s\-\,\.\!\'\?\(\)\:\;]+$/)
+            .withMessage('Description contains invalid characters'),
+
+        body('category')
+            .trim()
+            .notEmpty().withMessage('Please select a category')
+            .isLength({ min: 7, max: 25 }).withMessage('Category name length issue'),
+
+        body('cooking_time')
+            .trim()
+            .notEmpty().withMessage('Cooking time is required')
+            .isInt().withMessage('Cooking time must be a number'),
+        body('difficulty')
+            .isIn(['Easy', 'Medium', 'Hard']).withMessage('Invalid difficulty level'),
+body('ingredients').custom((value) => {
             const parsed = typeof value === 'string' ? JSON.parse(value) : value;
             if (!Array.isArray(parsed) || parsed.length === 0) throw new Error('Add at least one ingredient');
+            
+            const nameRegex = /^[a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s\-\,\.\(\)\/]+$/;
+            
+            parsed.forEach(ing => {
+                if (!ing.name || !nameRegex.test(ing.name)) {
+                    throw new Error(`Invalid characters in ingredient: ${ing.name || 'empty'}`);
+                }
+                if (ing.quantity && !nameRegex.test(ing.quantity)) {
+                    throw new Error(`Invalid characters in quantity for ${ing.name}`);
+                }
+            });
             return true;
         }),
         body('steps').custom((value) => {
             const parsed = typeof value === 'string' ? JSON.parse(value) : value;
             if (!Array.isArray(parsed) || parsed.length === 0) throw new Error('Add at least one step');
+            
+            const stepRegex = /^[a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s\-\,\.\!\'\?\(\)\:\;\n]+$/;
+
+            parsed.forEach((step, index) => {
+                const text = typeof step === 'object' ? step.description : step;
+                if (!text || !stepRegex.test(text)) {
+                    throw new Error(`Invalid characters in Step ${index + 1}`);
+                }
+            });
             return true;
         }),
     ],
