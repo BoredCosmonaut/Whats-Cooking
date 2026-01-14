@@ -92,18 +92,6 @@
       }
     }
 
-`    async function handleDeleteRecipe() {
-      if (!confirm('Are you sure you want to delete this recipe? This action cannot be undone.')) return;
-      try {
-        await deleteRecipe(recipe_id);
-        toast.success('Recipe deleted!');
-        router.push('/');
-      } catch (error) {
-        toast.error('❌ Failed to delete recipe.');
-      }
-    }
-`
-
 async function handleDeleteRecipe() {
   toast.info(
     ({ closeToast }) => 

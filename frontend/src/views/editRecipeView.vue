@@ -226,7 +226,6 @@ async function handleUpdate() {
 </template>
 
 <style scoped>
-/* Ana Konteyner - Clutter-free & Minimalist */
 .edit-recipe {
   max-width: 1000px;
   margin: 2rem auto;
@@ -237,7 +236,7 @@ async function handleUpdate() {
 
 h1 {
   font-size: 2.2rem;
-  color: #2d5a27; /* Orman Yeşili */
+  color: #2d5a27;
   font-weight: 300;
   text-align: center;
   margin-bottom: 3rem;
@@ -261,12 +260,11 @@ h3 {
   gap: 2rem;
 }
 
-/* Input ve Label Stilleri */
 label {
   font-size: 0.85rem;
   font-weight: 600;
   color: #2d5a27;
-  margin-bottom: -1.2rem; /* Label'ı inputa yaklaştırır */
+  margin-bottom: -1.2rem;
 }
 
 input, textarea, select {
@@ -301,7 +299,6 @@ input:focus, textarea:focus, select:focus {
   margin: 1.5rem 0;
 }
 
-/* Dinamik Satırlar (Ingredients & Steps) */
 .ingredient-row {
   display: grid;
   grid-template-columns: 2fr 1fr 40px;
@@ -312,7 +309,7 @@ input:focus, textarea:focus, select:focus {
 
 .step-row {
   display: flex;
-  align-items: flex-start; /* Üst hizalı kalsınlar */
+  align-items: flex-start; 
   gap: 1rem;
   margin-bottom: 1.5rem;
   width: 100%;
@@ -374,7 +371,7 @@ textarea {
 }
 
 .upload-btn {
-  background: #6b8e23; /* Zeytin Yeşili */
+  background: #6b8e23;
   color: white;
   border: none;
   padding: 0.8rem 1.5rem;
@@ -383,7 +380,7 @@ textarea {
 }
 
 .remove-btn {
-  margin-top: 2.2rem; /* Label hizasından aşağı indirmek için */
+  margin-top: 2.2rem; 
   background: transparent;
   border: none;
   color: #ccc;
@@ -397,7 +394,7 @@ textarea {
   color: #d32f2f;
 }
 
-/* Yardımcı Metinler */
+
 .helper-text {
   font-size: 0.75rem;
   color: #999;
@@ -413,7 +410,7 @@ textarea {
   text-align: center;
 }
 
-/* Disabled Durumu */
+
 .disabled-btn, :disabled {
   background: #f5f5f5 !important;
   color: #bbb !important;

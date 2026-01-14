@@ -96,19 +96,13 @@ const SUPABASE_URL = process.env.VUE_APP_API_SUPABASE_URL;
     font-weight: bold;
     margin: 0 0 0.5rem 0;
     color: #1B5E20; 
-    
-    /* TAŞMA ÇÖZÜMÜ: Çok uzun başlıklarda 2 satırdan sonrasını keser */
     display: -webkit-box;
-    -webkit-line-clamp: 2; /* Maksimum 2 satır göster */
+    -webkit-line-clamp: 2; 
     -webkit-box-orient: vertical;  
     overflow: hidden;
     text-overflow: ellipsis;
-    
-    /* Kelime çok uzunsa (boşluksuzsa) böl */
     overflow-wrap: break-word;
     word-break: break-word;
-    
-    /* Kartın yüksekliğini sabit tutmak için (opsiyonel) */
     min-height: 3.2rem; 
 }
 

@@ -1,8 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-    //baseURL: `https://whats-cooking-4ksv.onrender.com/api`,
-    baseURL: `http://localhost:8080/api`,
+    baseURL: process.env.VUE_APP_API_BASE_URL,
     withCredentials:true
 });
 
