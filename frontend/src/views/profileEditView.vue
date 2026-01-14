@@ -2,7 +2,7 @@
     import {ref, watch,onMounted} from 'vue'
     import { useRoute } from 'vue-router';
     import { useUser } from '@/composables/useUsers';
-
+    import { toast } from 'vue3-toastify';
 
     const {user,handleImageUpdate,updatePassword,updateProfileInfo,isLoading,fetchUser,error,passwordError} = useUser();
     const route = useRoute();
@@ -37,26 +37,26 @@
     async function submitGeneralInfo() {
         const payload = {username:username.value,email:email.value}
         const res = await updateProfileInfo(user_id,payload)
-        if(res) alert('Profile info updated')
+        if(res) toast.warning('Profile info updated')
     }
 
     async function submitProfileImage() {
         if(!imageFile.value) {
-            alert('please upload an image first')
+            toast.warning('please upload an image first')
             return
         }
         const formData = new FormData()
         formData.append('image',imageFile.value);
         const res = await handleImageUpdate(user_id,formData)
         if (res){ 
-            alert('Profile picture updated!')
+            toast.success('Profile picture updated!')
             if (res.url) imageUrl.value = res.url;
         }
     }
 
     async function submitPassword() {
         if (!newPassword.value) {
-            alert('New password is required!')
+            toast.warning('New password is required!')
             return
         }
 
@@ -66,7 +66,7 @@
         }
 
         const res = await updatePassword(user_id,payload);
-        if(res) alert('Password changed');
+        if(res) toast.success('Password changed');
     }
 
     onMounted(async () => {

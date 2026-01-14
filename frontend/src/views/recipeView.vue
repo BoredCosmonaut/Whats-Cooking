@@ -41,19 +41,20 @@
 
 
 
-    async function  handleSubmitReview() {
+    async function handleSubmitReview() {
       try {
         if(!newReview.value.rating && !newReview.value.comment && !newReview.value.image) {
           toast.warning('Lütfen puan, yorum ve görsel alanlarını doldurun.');
           return;
         }
-
         await postReview(recipe_id,newReview.value);
         await getReviewsForRecipe(recipe_id);
-        toast.success('Yorumunuz başarıyla eklendi! ⭐');
+        toast.success('Yorumunuz başarıyla eklendi!');
         newReview.value = { rating: '', comment: '', image: null };
       } catch (error) {
-        toast.error('Yorum gönderilirken bir hata oluştu.');
+        const backendMessage = error.response?.data?.message || 'Bir hata oluştu.';
+        toast.error(backendMessage); 
+        console.log("Toast'ta gösterilen mesaj:", backendMessage);
       }
     }
 
@@ -80,11 +81,11 @@
         if(isFavorite.value) {
           await removeFavoriteRecipe(recipe_id);
           isFavorite.value = false;
-          toast.info('Favorilerden çıkarıldı 💔');
+          toast.info('Favorilerden çıkarıldı');
         } else{
           await addFavoriteRecipe(recipe_id);
           isFavorite.value = true;
-          toast.success('Favorilere eklendi! ❤️');
+          toast.success('Favorilere eklendi!');
         }
       } catch (error) {
         toast.error('Favori işlemi başarısız oldu.');
@@ -133,15 +134,15 @@ async function handleDeleteRecipe() {
 }
 
 // proceedDelete fonksiyonu aynı kalıyor
-async function proceedDelete() {
-  try {
-    await deleteRecipe(recipe_id);
-    toast.success('Tarif başarıyla silindi 🌿');
-    router.push('/');
-  } catch (error) {
-    toast.error('Silme işlemi başarısız oldu.');
-  }
-}
+    async function proceedDelete() {
+    try {
+        await deleteRecipe(recipe_id);
+        toast.success('Tarif başarıyla silindi');
+        router.push('/');
+    } catch (error) {
+        toast.error('Silme işlemi başarısız oldu.');
+    }
+    }
 
     function handleUpdateRecipe() {
       router.push(`/recipe/update/${recipe_id}`)
@@ -273,18 +274,13 @@ async function proceedDelete() {
 </template>
 
 <style scoped>
-/* Hex Codes Used:
-#4CAF50 - Primary Green
-#1B5E20 - Dark Green
-#E8F5E9 - Very Light Green
-#E0E0E0 - Light Gray
-#FFFFFF - White
-*/
+/* Renk Paleti: #4CAF50 (Yeşil), #1B5E20 (Koyu Yeşil), #E8F5E9 (Açık Yeşil) */
 
 .main {
     max-width: 1000px; 
     margin: 0 auto;
     padding: 2rem 1rem;
+    word-wrap: break-word; /* Genel bir güvenlik önlemi */
 }
 
 .recipe-detail {
@@ -298,6 +294,11 @@ async function proceedDelete() {
     color: #1B5E20; 
     margin-bottom: 0.5rem;
     text-align: center;
+    line-height: 1.2;
+    /* Taşma Düzeltmeleri */
+    width: 100%;
+    overflow-wrap: anywhere; /* break-word'den daha agresiftir */
+    word-break: break-word;
 }
 
 .section-title {
@@ -314,21 +315,46 @@ async function proceedDelete() {
     margin: 1.5rem 0;
 }
 
-.label {
-    font-weight: bold;
-    color: #1B5E20;
-    margin-right: 0.5rem;
-}
-
 .header-content {
     display: grid;
     grid-template-columns: 2fr 1fr; 
     gap: 2rem;
+    /* Grid taşmalarını engellemek için kritik */
+    min-width: 0; 
 }
 
+/* Sağ taraftaki meta ve açıklama sütunu */
+.meta-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 0.5rem 0;
+    /* İçeriğin sütunu genişletmesini engeller */
+    min-width: 0; 
+}
+
+.desc-box {
+    width: 100%;
+    min-width: 0;
+    overflow-wrap: break-word;
+}
+
+.description-text {
+    line-height: 1.6;
+    color: #555;
+    font-style: italic;
+    width: 100%;
+    /* Hem satır sonlarını korur hem de taşmayı engeller */
+    white-space: pre-wrap; 
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+/* Diğer Bileşenler */
 .image-area {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .recipe-image {
@@ -340,37 +366,29 @@ async function proceedDelete() {
     margin-bottom: 1rem;
 }
 
-
-.meta-info {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    padding: 0.5rem 0;
-}
-
 .meta-box p {
     font-size: 1rem;
     padding: 0.25rem 0;
     border-bottom: 1px dashed #E0E0E0;
     color: #444;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap; 
+    gap: 5px;
 }
 
-.description-text {
-    line-height: 1.6;
-    color: #555;
-    font-style: italic;
+.label {
+    font-weight: bold;
+    color: #1B5E20;
 }
 
 .submitted-by {
     display: flex;
     align-items: center;
     padding: 10px;
-    background-color: #E8F5E9; /* Light green background */
+    background-color: #E8F5E9;
     border-radius: 6px;
-}
-
-.submitted-by .label {
-    margin-right: 1rem;
+    min-width: 0;
 }
 
 .user-image {
@@ -380,19 +398,21 @@ async function proceedDelete() {
     object-fit: cover;
     border: 2px solid #4CAF50;
     margin-right: 0.5rem;
+    flex-shrink: 0; /* Resmin ezilmesini önler */
 }
 
 .username {
     font-weight: bold;
     color: #1B5E20;
-    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-
 
 .recipe-actions {
     display: flex;
     gap: 0.5rem;
     justify-content: flex-end;
+    flex-wrap: wrap;
 }
 
 .favorite-btn, .edit-btn, .delete-btn {
@@ -404,31 +424,9 @@ async function proceedDelete() {
     border: none;
 }
 
-.favorite-btn {
-    background: #A5D6A7; 
-    color: #1B5E20;
-}
-
-.favorite-btn:hover {
-    background: #4CAF50;
-    color: #FFFFFF;
-}
-
-.edit-btn {
-    background: #4CAF50;
-    color: white;
-}
-.edit-btn:hover {
-    background: #1B5E20;
-}
-
-.delete-btn {
-    background: #f44336;
-    color: white;
-}
-.delete-btn:hover {
-    background: #d32f2f;
-}
+.favorite-btn { background: #A5D6A7; color: #1B5E20; }
+.edit-btn { background: #4CAF50; color: white; }
+.delete-btn { background: #f44336; color: white; }
 
 .preparation-sections {
     display: grid;
@@ -436,117 +434,19 @@ async function proceedDelete() {
     gap: 3rem;
     margin-bottom: 2rem;
     padding-top: 1rem;
+    min-width: 0;
 }
 
-.ingredient-list {
-    list-style-type: none; 
-    padding-left: 0;
+.ingredient-list li, .step-list li {
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
-
-.ingredient-list li {
-    padding: 0.4rem 0;
-    border-bottom: 1px dashed #E8F5E9;
-    color: #555;
-}
-
-.step-list {
-    padding-left: 20px;
-}
-
-.step-list li {
-    margin-bottom: 1rem;
-    line-height: 1.5;
-    color: #333;
-}
-
-.step-number-label {
-    font-weight: bold;
-    color: #4CAF50;
-    margin-right: 0.5rem;
-}
-
-
-.add-review {
-    padding: 1.5rem;
-    background-color: #f9f9f9; 
-    border-radius: 8px;
-    margin-bottom: 2rem;
-}
-
-.review-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.form-group label {
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-    color: #1B5E20;
-}
-
-.input-field {
-    padding: 0.6rem;
-    border: 1px solid #E0E0E0;
-    border-radius: 4px;
-    font-size: 1rem;
-    transition: border-color 0.2s;
-}
-
-.input-field:focus {
-    border-color: #4CAF50;
-    outline: none;
-}
-
-textarea.input-field {
-    resize: vertical;
-    min-height: 80px;
-}
-
-.submit-btn {
-    background: #4CAF50;
-    color: white;
-    padding: 0.75rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 700;
-    transition: background 0.2s;
-}
-
-.submit-btn:hover {
-    background: #1B5E20;
-}
-
-
-.reviews-section {
-    padding: 1rem 0;
-}
-
-.review-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-    gap: 2.5rem; 
-    justify-content: center;
-}
-
 
 @media (max-width: 768px) {
-    .header-content {
-        grid-template-columns: 1fr; 
-    }
-    
-    .preparation-sections {
+    .title { font-size: 1.8rem; }
+    .header-content, .preparation-sections {
         grid-template-columns: 1fr;
     }
-    
-    .recipe-image {
-        height: 250px; 
-    }
+    .recipe-image { height: 250px; }
 }
 </style>

@@ -1,8 +1,13 @@
 const reviewModel = require('../model/reviewModel');
 const userModel = require('../model/userModel'); 
 const recipeModel = require('../model/recipeModel');
+const { validationResult } = require('express-validator');
 const {uploadToSupabase} = require(`../middleware/dynamicUploadMiddleware`)
 async function createReview(req,res) {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        return res.status(400).json({message: errors.array()[0].msg})
+    }
     try {
         console.log('Review posted');
         const user_id = req.user.id;
@@ -73,6 +78,11 @@ async function removeReview(req,res) {
 };
 
 async function reportReview(req,res) {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        return res.status(400).json({message: errors.array()[0].msg})
+    }
+
     try {
         const review_id = req.params.id;
         const user_id = req.user.id;

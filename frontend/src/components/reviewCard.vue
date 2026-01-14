@@ -1,7 +1,7 @@
 <script setup>
   import { defineProps, ref, watch } from "vue";
   import { useReview } from "@/composables/useReview";
-
+  import { toast } from 'vue3-toastify';
   const props = defineProps({
     review: {
       type: Object,
@@ -17,6 +17,8 @@
   const userId = Number(localStorage.getItem('userId'));
   const reviewState = ref({ ...props.review });
   console.log('User from composable:', userId)
+  const isReporting = ref(false)
+  const reportReason = ref("")
   watch(
     () => props.review,
     (newVal) => {
@@ -30,8 +32,10 @@
       let res;
       if (reviewState.value.liked_by_user) {
         res = await unmarkReviewHelpful(reviewState.value.review_id);
+        toast.success('Unmarked the review')
       } else {
         res = await markReviewHelpful(reviewState.value.review_id);
+        toast.success('Marked the review')
       }
 
       if (res && res.helpful_count !== undefined) {
@@ -43,6 +47,7 @@
       }
     } catch (error) {
       console.error("Error marking helpful:", error);
+      toast.error('Error while marking the review')
     }
   }
 
@@ -51,21 +56,22 @@
     if(!confirmDelete) return
     try {
       await removeReview(reviewState.value.review_id)
-      alert("✅ Review deleted successfully");
+      toast.success("✅ Review deleted successfully");
       if (props.onDeleted) props.onDeleted(reviewState.value.review_id);
     } catch (error) {
-      alert("Failed to delete review.");
+      toast.error("Failed to delete review.");
     }
   }
 
-  async function handleReport() {
-    const reason = prompt('Please enter a reason for reporting this review:')
-    if (!reason) return alert('You must enter a reason to report.')
+  async function submitReport() {
+    if (!reportReason.value.trim()) return toast.warning('You must enter a reason to report.')
     try {
-      const res = await reportReview(reviewState.value.review_id,reason);
-      alert(res.message || 'Review reported!')
+      const res = await reportReview(reviewState.value.review_id,reportReason.value);
+      toast.success(res.message || 'Review reported!')
+      isReporting.value = false
+      reportReason.value = ""
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to report review.')
+      toast.error(error.response?.data?.message || 'Failed to report review.')
     }
   }
 
@@ -84,192 +90,233 @@ const SUPABASE_URL = process.env.VUE_APP_API_SUPABASE_URL;
       />
       </div>
 
-    <div class="review-content-area">
-        <div class="review-header">
-            <h3 class="username">{{ reviewState.reviewer }}</h3>
-            <div v-if="reviewState.rating" class="rating">
-                ⭐ {{ reviewState.rating }}/5
-            </div>
-        </div>
+      <div class="review-content-area">
+          <div v-if="isReporting" class="report-overlay">
+              <textarea 
+                  v-model="reportReason" 
+                  placeholder="Why are you reporting? 🌿"
+                  class="report-textarea"
+              ></textarea>
+              <div class="report-actions">
+                  <button @click="submitReport" class="confirm-report-btn">Send</button>
+                  <button @click="isReporting = false" class="cancel-btn">Cancel</button>
+              </div>
+          </div>
 
-        <p class="review-text-compact">{{ reviewState.comment }}</p>
-
-        <div class="actions">
-            <button
-                @click="handleHelpfulClick"
-                :class="['helpful-btn', reviewState.liked_by_user ? 'active' : '']"
-            >
-                👍 ({{ reviewState.helpful_count ?? 0 }})
-            </button>
-
-            <button 
-                @click="handleReport" 
-                class="report-btn"
-            >
-                🚩 Report
-            </button>
-
-
-            <button
-                v-if="userId && userId === reviewState.user_id"
-                class="delete-btn"
-                @click="handleDelete"
-            >
-                🗑 Delete
-            </button>
-        </div>
-        <p class="date">{{ new Date(reviewState.created_at).toLocaleDateString() }}</p>
-    </div>
+          <template v-else>
+              <div class="review-header">
+                  <h3 class="username">{{ reviewState.reviewer }}</h3>
+                  <div v-if="reviewState.rating" class="rating">⭐ {{ reviewState.rating }}/5</div>
+              </div>
+              <p class="review-text-compact">{{ reviewState.comment }}</p>
+              <div class="actions">
+                  <button @click="handleHelpfulClick" :class="['helpful-btn', reviewState.liked_by_user ? 'active' : '']">👍 ({{ reviewState.helpful_count ?? 0 }})</button>
+                  <button @click="isReporting = true" class="report-btn">🚩 Report</button>
+                  <button v-if="userId && userId === reviewState.user_id" class="delete-btn" @click="handleDelete">🗑 Delete</button>
+              </div>
+              <p class="date">{{ new Date(reviewState.created_at).toLocaleDateString() }}</p>
+          </template>
+      </div>
   </div>
 </template>
 
 <style scoped>
-/* Hex Codes Used:
-#4CAF50 - Primary Green
-#1B5E20 - Dark Green
-#E8F5E9 - Very Light Green
-#E0E0E0 - Light Gray
-#FFFFFF - White
+/* Palette:
+  - Primary Green: #4CAF50
+  - Dark Green: #1B5E20
+  - Light Background: #E8F5E9
+  - Borders/Gray: #E0E0E0
+  - White: #FFFFFF
 */
+
 .review-card {
     display: flex; 
     flex-direction: column; 
     width: 300px; 
-    height: 450px;
+    /* Metin uzunluğuna göre kartın uzamasını sağlar */
+    min-height: 400px;
+    height: auto;
     background: #FFFFFF;
-    border-radius: 8px;
-    border: 2px solid #E0E0E0;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    padding: 0; 
-    margin-bottom: 0; 
-    transition: border-color 0.2s ease;
-    overflow: hidden;
-    justify-content: center;
-    align-items: center;
+    border-radius: 12px; /* Biraz daha yumuşak köşeler minimalist durur */
+    border: 1px solid #E0E0E0; /* Daha ince çizgiler kalabalığı azaltır */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Daha hafif bir gölge */
+    margin-bottom: 24px; 
+    transition: all 0.3s ease;
+    overflow: hidden; /* Overlay animasyonu için gerekli */
 }
 
 .review-card:hover {
     border-color: #4CAF50;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.15);
 }
-
 
 .review-media-area {
     width: 100%;
-    height: 60%; 
-    flex-shrink: 0;
+    height: 200px; /* Görsel alanını sabit tutmak düzeni korur */
+    background-color: #F9F9F9;
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
 }
 
 .review-image-main {
-    width: 95%; 
-    height: 95%;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    display: block;
+    transition: transform 0.5s ease;
+}
+
+.review-card:hover .review-image-main {
+    transform: scale(1.05);
 }
 
 .review-content-area {
-    width: 90%;
-    height: 40%;
-    padding: 1rem;
+    position: relative; /* Report overlay için gerekli */
+    width: 100%;
+    padding: 1.25rem;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .review-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
-    padding-bottom: 0.25rem;
-    border-bottom: 1px dashed #E8F5E9;
+    margin-bottom: 0.75rem;
 }
 
 .username {
     font-weight: 700;
     color: #1B5E20; 
-    font-size: 1.1rem;
+    font-size: 1rem;
     margin: 0;
-}
-
-.date {
-    font-size: 0.75rem;
-    color: #999;
 }
 
 .rating {
     font-weight: 600;
-    color: #f4b400; 
+    color: #f4b400;
+    font-size: 0.9rem;
 }
 
+/* Metnin tamamını gösteren ana kısım */
 .review-text-compact {
     color: #444;
-    line-height: 1.4;
-    margin: 0 0 0.5rem 0;
-    font-size: 0.9rem;
-    display: -webkit-box;
-    line-clamp: 2; 
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    line-height: 1.6;
+    margin: 0.5rem 0 1.5rem 0;
+    font-size: 0.95rem;
+    word-wrap: break-word; /* Uzun kelimelerin taşmasını önler */
 }
 
 .actions {
     display: flex;
     align-items: center;
-    gap: 0.5rem; 
-    margin-top: auto;
-    padding-top: 0.5rem;
+    gap: 8px; 
+    margin-top: auto; /* Butonları her zaman en alta iter */
+    padding-top: 1rem;
+    border-top: 1px solid #F0F0F0;
 }
 
 .helpful-btn, .report-btn, .delete-btn {
     border: 1px solid #E0E0E0; 
-    background: #F9F9F9; 
-    padding: 0.3rem 0.6rem; 
-    border-radius: 4px; 
+    background: #FFFFFF; 
+    padding: 6px 10px; 
+    border-radius: 6px; 
     cursor: pointer;
     font-size: 0.75rem; 
     font-weight: 600;
+    transition: all 0.2s;
 }
 
 .helpful-btn.active {
     background: #4CAF50; 
     color: #FFFFFF;
+    border-color: #4CAF50;
 }
 
-.helpful-btn:hover {
+.helpful-btn:not(.active):hover {
     background: #E8F5E9;
-    border-color: #4CAF50;
     color: #1B5E20;
+    border-color: #4CAF50;
 }
 
 .delete-btn {
-    background: none;
-    color: #ff4d4f;
-    border-color: #ff4d4f;
+    color: #D32F2F;
+    border: none;
 }
 
 .report-btn {
-    background: none;
-    color: #ff9800;
-    border-color: #ff9800;
+    color: #757575;
+    border: none;
 }
 
-.image-gallery, .review-image {
-    display: none; 
+.date {
+    font-size: 0.7rem;
+    color: #AAA;
+    margin-top: 8px;
+    align-self: flex-end;
 }
 
+/* Raporlama Overlay Tasarımı */
+.report-overlay {
+    background: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: fadeIn 0.3s ease;
+}
+
+.report-textarea {
+    width: 100%;
+    min-height: 80px;
+    border: 1px solid #E0E0E0;
+    border-radius: 6px;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    resize: none;
+    outline: none;
+}
+
+.report-textarea:focus {
+    border-color: #4CAF50;
+}
+
+.report-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.confirm-report-btn {
+    background: #1B5E20;
+    color: white;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.cancel-btn {
+    background: #F5F5F5;
+    color: #666;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Düzenleme */
 @media (max-width: 600px) {
     .review-card {
         width: 100%;
-        max-width: 100%;
-        height: auto;
-    }
-    .review-media-area {
-        height: 200px;  
     }
 }
 </style>

@@ -26,8 +26,9 @@ export async function postReview(recipe_id,formData) {
         headers: { 'Content-Type': 'multipart/form-data' },
         });
         return res.data
-    } catch (error) {
-        console.error('Error posting review:', error);
+    } catch (err) {
+        console.error('Error posting review:', err);
+        throw err
     }
 }
 

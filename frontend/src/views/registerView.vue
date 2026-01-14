@@ -29,7 +29,7 @@
         const result = await registerUser(username.value,email.value,password.value);
         if(result) {
             message.value = result.message; 
-            toast.success('Kayıt başarılı! Lütfen e-posta adresine gönderilen doğrulama linkine tıkla.');
+            toast.success('Registration Complete');
             router.push('/login')
         }
     }

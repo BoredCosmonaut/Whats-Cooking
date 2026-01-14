@@ -4,9 +4,14 @@ const fsPromises = require('fs').promises;
 const recipeModel = require('../model/recipeModel');
 const userModel = require('../model/userModel');
 const { error } = require('console');
+const { validationResult } = require('express-validator');
 const {uploadToSupabase} = require(`../middleware/dynamicUploadMiddleware`)
 
 async function createRecipe(req, res) {
+  const errors = validationResult(req);
+  if(!errors.isEmpty()) {
+    return res.status(400).json({message: errors.array()[0].msg})
+  }
   try {
     console.log("createRecipe called once for recipe:", req.body.title);
     let { title, description, category, cooking_time, difficulty, ingredients, steps } = req.body;
@@ -75,6 +80,10 @@ async function createRecipe(req, res) {
 
 
 async function getRecipeInfoById(req,res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg });
+  }
   try {
     const recipe_id = req.params.id;
     const recipe = await recipeModel.getRecipeInfoById(recipe_id);
@@ -96,6 +105,10 @@ async function getAllRecipes(req,res) {
 };
 
 async function updateRecipe(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg });
+  }
   try {
     const recipe_id = req.params.id;
 
@@ -168,6 +181,10 @@ async function updateRecipeImage(req,res) {
 };
 
 async function deleteRecipe(req,res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg });
+  }
   try {
     const id = req.params.id;
     const recipe = await recipeModel.getRecipeInfoById(id);
@@ -199,6 +216,10 @@ async function deleteRecipe(req,res) {
 };
 
 async function searchRecipes(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg });
+  }
   try {
     const { name } = req.query; 
     
@@ -220,6 +241,10 @@ async function searchRecipes(req, res) {
 
 
 async function addFavoriteRecipe(req,res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg });
+  }
   try {
     const user_id = req.user.id;
     const recipe_id = req.params.id;
@@ -235,6 +260,10 @@ async function addFavoriteRecipe(req,res) {
 };
 
 async function removeFavoriteRecipe(req,res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg });
+  }
   try {
     console.log('Params:', req.params);
     const user_id = req.user.id;
@@ -264,6 +293,10 @@ async function getUserFavorites(req,res) {
 };
 
 async function searchRecipeByIngredients(req,res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array()[0].msg });
+  }
   try {
     const {ingredients} = req.body;
   

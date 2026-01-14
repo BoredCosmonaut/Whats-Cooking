@@ -61,7 +61,7 @@ export function useReview(){
         }
     }
 
-    async function postReview(recipe_id,reviewData) {
+async function postReview(recipe_id, reviewData) {
         isLoading.value = true;
         error.value = null;
         try {
@@ -69,16 +69,15 @@ export function useReview(){
                 throw new Error("Görsel 5MB'dan büyük olamaz.");
             }
             const formData = new FormData();
-            formData.append('rating',reviewData.rating);
-            formData.append('comment',reviewData.comment);
-            formData.append('image',reviewData.image);
+            formData.append('rating', reviewData.rating);
+            formData.append('comment', reviewData.comment);
+            formData.append('image', reviewData.image);
 
-            const res = await postReviewApi(recipe_id,formData)
-
+            const res = await postReviewApi(recipe_id, formData);
             return res;
         } catch (err) {
             console.error('Error posting review:', err);
-            throw err
+            throw err; 
         } finally {
             isLoading.value = false;
         }
