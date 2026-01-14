@@ -108,7 +108,7 @@ async function handleDeleteRecipe() {
   toast.info(
     ({ closeToast }) => 
       h('div', { class: 'toast-confirm-container' }, [
-        h('p', { class: 'toast-text' }, 'Bu tarifi silmek istediğinize emin misiniz?'),
+        h('p', { class: 'toast-text' }, 'Do you want to delete the recipe'),
         h('div', { class: 'toast-actions' }, [
           h('button', { 
             class: 'toast-btn-yes', 
@@ -116,11 +116,11 @@ async function handleDeleteRecipe() {
               closeToast();
               await proceedDelete();
             } 
-          }, 'Evet, Sil'),
+          }, 'Yes'),
           h('button', { 
             class: 'toast-btn-no', 
             onClick: closeToast 
-          }, 'Vazgeç')
+          }, 'Cancel')
         ])
       ]),
     {
@@ -440,6 +440,76 @@ async function handleDeleteRecipe() {
 .ingredient-list li, .step-list li {
     overflow-wrap: break-word;
     word-break: break-word;
+}
+
+.add-review {
+    margin: 4rem 0;
+    padding: 2.5rem;
+    background: #fbfdfb;
+    border-radius: 4px;
+}
+
+.review-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 100%; /* Genişlik artırıldı */
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.input-field {
+    padding: 1rem 0;
+    border: none;
+    border-bottom: 1px solid #e0e0e0;
+    background: transparent;
+    font-size: 1.05rem;
+    transition: border-color 0.3s;
+    width: 100%;
+}
+
+.input-field:focus {
+    outline: none;
+    border-bottom: 1.5px solid #2d5a27;
+}
+
+textarea.input-field {
+    resize: none;
+    min-height: 100px;
+}
+
+.submit-btn {
+    background: #2d5a27;
+    color: white;
+    padding: 1rem 2.5rem;
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    align-self: flex-start;
+}
+
+.submit-btn:hover:not(.disabled-btn) {
+    background: #1B5E20;
+}
+
+.helper-text {
+    font-size: 0.8rem;
+    color: #999;
+    margin-top: -1rem;
+}
+.review-list {
+    display: grid;
+    /* 300px genişliğinde kartlar oluşturur, sığmadığında alta atar */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+    gap: 2rem;
+    padding: 1rem 0;
+    width: 100%;
 }
 
 @media (max-width: 768px) {

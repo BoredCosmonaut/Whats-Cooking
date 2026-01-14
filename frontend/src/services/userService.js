@@ -26,8 +26,13 @@ export async function getClowns() {
 }
 
 export async function updateProfileInfo(user_id,data) {
-    const result = await api.put(`/users/profile/${user_id}`, data);
-    return result.data
+    try {
+        const result = await api.put(`/users/profile/${user_id}`, data);
+        return result.data
+    } catch (err) {
+        console.error(err)
+        throw err
+    }
 }
 
 export async function updateProfilePicture(user_id,data) {
@@ -38,6 +43,11 @@ export async function updateProfilePicture(user_id,data) {
 }
 
 export async function updatePassword(user_id,data) {
-    const result = await api.put(`users/updatePassword/${user_id}`,data)
-    return result.data
+    try {
+        const result = await api.put(`users/updatePassword/${user_id}`,data)
+        return result.data   
+    } catch (err) {
+        console.error(err)
+        throw err
+    }
 }

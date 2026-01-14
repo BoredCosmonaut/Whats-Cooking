@@ -1,5 +1,5 @@
 <script setup>
-  import { defineProps, ref, watch } from "vue";
+  import { defineProps, ref, watch,h } from "vue";
   import { useReview } from "@/composables/useReview";
   import { toast } from 'vue3-toastify';
   const props = defineProps({
@@ -51,17 +51,44 @@
     }
   }
 
-  async function handleDelete() {
-    const confirmDelete = confirm('Are you sure you want to delete this review?');
-    if(!confirmDelete) return
-    try {
-      await removeReview(reviewState.value.review_id)
-      toast.success("✅ Review deleted successfully");
-      if (props.onDeleted) props.onDeleted(reviewState.value.review_id);
-    } catch (error) {
-      toast.error("Failed to delete review.");
+async function handleDelete() {
+  toast.info(
+    ({ closeToast }) => 
+      h('div', { class: 'toast-confirm-container' }, [
+        h('p', { class: 'toast-text' }, 'Do you want to delete your review?'),
+        h('div', { class: 'toast-actions' }, [
+          h('button', { 
+            class: 'toast-btn-yes', 
+            onClick: async () => {
+              closeToast(); // Onay kutusunu kapat
+              await proceedDelete(); // Silme işlemini başlat
+            } 
+          }, 'Yes'),
+          h('button', { 
+            class: 'toast-btn-no', 
+            onClick: closeToast // Sadece kapat
+          }, 'Cancel')
+        ])
+      ]),
+    {
+      position: 'top-center',
+      autoClose: false,
+      closeOnClick: false,
+      draggable: false,
+      icon: false
     }
+  );
+}
+
+async function proceedDelete() {
+  try {
+    await removeReview(reviewState.value.review_id);
+    toast.success("Review Deleted");
+    if (props.onDeleted) props.onDeleted(reviewState.value.review_id);
+  } catch (error) {
+    toast.error("Failed to delete the review");
   }
+}
 
   async function submitReport() {
     if (!reportReason.value.trim()) return toast.warning('You must enter a reason to report.')
@@ -133,16 +160,15 @@ const SUPABASE_URL = process.env.VUE_APP_API_SUPABASE_URL;
     display: flex; 
     flex-direction: column; 
     width: 300px; 
-    /* Metin uzunluğuna göre kartın uzamasını sağlar */
     min-height: 400px;
     height: auto;
     background: #FFFFFF;
-    border-radius: 12px; /* Biraz daha yumuşak köşeler minimalist durur */
-    border: 1px solid #E0E0E0; /* Daha ince çizgiler kalabalığı azaltır */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Daha hafif bir gölge */
+    border-radius: 12px;
+    border: 1px solid #E0E0E0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     margin-bottom: 24px; 
     transition: all 0.3s ease;
-    overflow: hidden; /* Overlay animasyonu için gerekli */
+    overflow: hidden; 
 }
 
 .review-card:hover {
@@ -152,7 +178,7 @@ const SUPABASE_URL = process.env.VUE_APP_API_SUPABASE_URL;
 
 .review-media-area {
     width: 100%;
-    height: 200px; /* Görsel alanını sabit tutmak düzeni korur */
+    height: 200px; 
     background-color: #F9F9F9;
     display: flex;
     justify-content: center;
@@ -172,7 +198,7 @@ const SUPABASE_URL = process.env.VUE_APP_API_SUPABASE_URL;
 }
 
 .review-content-area {
-    position: relative; /* Report overlay için gerekli */
+    position: relative; 
     width: 100%;
     padding: 1.25rem;
     display: flex;
@@ -192,6 +218,10 @@ const SUPABASE_URL = process.env.VUE_APP_API_SUPABASE_URL;
     color: #1B5E20; 
     font-size: 1rem;
     margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px; 
 }
 
 .rating {
@@ -200,20 +230,23 @@ const SUPABASE_URL = process.env.VUE_APP_API_SUPABASE_URL;
     font-size: 0.9rem;
 }
 
-/* Metnin tamamını gösteren ana kısım */
 .review-text-compact {
     color: #444;
     line-height: 1.6;
     margin: 0.5rem 0 1.5rem 0;
     font-size: 0.95rem;
-    word-wrap: break-word; /* Uzun kelimelerin taşmasını önler */
+    overflow-wrap: break-word; 
+    word-wrap: break-word;
+    word-break: break-word;
+    display: block;
+    width: 100%;
 }
 
 .actions {
     display: flex;
     align-items: center;
     gap: 8px; 
-    margin-top: auto; /* Butonları her zaman en alta iter */
+    margin-top: auto; 
     padding-top: 1rem;
     border-top: 1px solid #F0F0F0;
 }
@@ -258,12 +291,12 @@ const SUPABASE_URL = process.env.VUE_APP_API_SUPABASE_URL;
     align-self: flex-end;
 }
 
-/* Raporlama Overlay Tasarımı */
 .report-overlay {
     background: #FFFFFF;
     display: flex;
     flex-direction: column;
     gap: 12px;
+    margin-right: 5%;
     animation: fadeIn 0.3s ease;
 }
 
@@ -306,6 +339,51 @@ const SUPABASE_URL = process.env.VUE_APP_API_SUPABASE_URL;
     padding: 6px 16px;
     border-radius: 6px;
     cursor: pointer;
+}
+
+:deep(.toast-confirm-container) {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px;
+}
+
+:deep(.toast-text) {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #1B5E20; 
+  font-weight: 500;
+}
+
+:deep(.toast-actions) {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+:deep(.toast-btn-yes) {
+  background: #d32f2f; 
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+:deep(.toast-btn-no) {
+  background: #f1f8f1; 
+  color: #2d5a27;
+  border: 1px solid #e8f5e9;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+:deep(.toast-btn-no:hover) {
+  background: #e8f5e9;
 }
 
 @keyframes fadeIn {

@@ -70,23 +70,37 @@
         }
     }
 
-    async function handleUpdate() {
+async function handleUpdate() {
+    try {
+        console.log("1. Update başlatılıyor...");
         const payload = {
-            title:title.value,
+            title: title.value,
             description: description.value,
             category: category.value,
             cooking_time: cooking_time.value,
             difficulty: difficulty.value,
-            ingredients: ingredients.value,
-            steps: steps.value.map(s => s.description.trim())
+            ingredients: JSON.stringify(ingredients.value),
+            steps: JSON.stringify(steps.value.map(s => s.description.trim()))
         }
 
-        const res = await updateRecipe(recipe_id,payload);
-        if(res) {
-            toast.success('Recipe Updated!')
-            router.push(`/recipe/${recipe_id}`)
-        }
+        const res = await updateRecipe(recipe_id, payload);
+        console.log("2. Başarılı yanıt:", res);
+        
+        toast.success('Recipe Updated! 🌿');
+        router.push(`/recipe/${recipe_id}`);
+    } catch (err) {
+        console.error("3. Yakalanan hata objesi:", err); // Burayı kontrol et
+        
+        // Hata mesajını daha derinlemesine ara
+        const errorMessage = 
+            err.response?.data?.message || 
+            err.response?.data?.errors?.[0]?.msg || 
+            err.message || 
+            'Failed to update recipe';
+            
+        toast.error(errorMessage);
     }
+}
 
     async function handleImageUpload() {
         if(!imageFile.value) {
@@ -212,100 +226,207 @@
 </template>
 
 <style scoped>
+/* Ana Konteyner - Clutter-free & Minimalist */
 .edit-recipe {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 2rem;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 3rem 1.5rem;
+  background: #ffffff;
+  color: #333;
 }
 
 h1 {
+  font-size: 2.2rem;
+  color: #2d5a27; /* Orman Yeşili */
+  font-weight: 300;
   text-align: center;
-  margin-bottom: 2rem;
-  font-size: 2rem;
+  margin-bottom: 3rem;
+  letter-spacing: -1px;
 }
 
+h3 {
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #888;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 0.5rem;
+}
+
+/* Form Yapısı */
 .form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 2rem;
 }
 
+/* Input ve Label Stilleri */
 label {
-  font-weight: 500;
-  color: #444;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2d5a27;
+  margin-bottom: -1.2rem; /* Label'ı inputa yaklaştırır */
 }
 
 input, textarea, select {
-  padding: 0.7rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 1rem;
-  width: 100%;
-}
-
-textarea {
-  resize: vertical;
-}
-
-.ingredient-row, .step-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.add-btn, .submit-btn, .upload-btn {
-  background: #2c7be5;
-  color: #fff;
+  padding: 0.8rem 0;
   border: none;
-  padding: 0.7rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s;
+  border-bottom: 1px solid #e0e0e0;
+  border-radius: 0;
+  font-size: 1.05rem;
+  background: transparent;
+  transition: all 0.3s ease;
 }
 
-.add-btn:hover, .submit-btn:hover, .upload-btn:hover {
-  background: #1a5fc4;
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-bottom: 1.5px solid #2d5a27;
 }
 
+/* Resim Bölümü */
 .image-section {
-  margin-top: 2rem;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  width: 50%;
-  align-items: center;
-  justify-content: center;
-  margin: auto;
+  background: #fbfdfb;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-bottom: 3rem;
+  border: 1px dashed #e0e8e0;
 }
 
 .preview {
   width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin: 1.5rem 0;
+}
+
+/* Dinamik Satırlar (Ingredients & Steps) */
+.ingredient-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 40px;
+  gap: 1rem;
   align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  margin-top: 1rem;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin-bottom: 1rem;
+}
+
+.step-row {
+  display: flex;
+  align-items: flex-start; /* Üst hizalı kalsınlar */
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.step-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; 
+  gap: 0.5rem;
+}
+
+
+textarea {
+  width: 100%;
+  resize: none; 
+  min-height: 80px; 
+  padding: 0.8rem;
+  border: 1px solid #f0f0f0; 
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.step-row label {
+    margin-bottom: 0.5rem;
+}
+
+/* Butonlar */
+.submit-btn {
+  background: #2d5a27;
+  color: white;
+  border: none;
+  padding: 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  margin-top: 2rem;
+}
+
+.submit-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.add-btn {
+  background: transparent;
+  color: #2d5a27;
+  border: 1px solid #2d5a27;
+  padding: 0.6rem;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.add-btn:hover {
+  background: #f1f8f1;
+}
+
+.upload-btn {
+  background: #6b8e23; /* Zeytin Yeşili */
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.remove-btn {
+  margin-top: 2.2rem; /* Label hizasından aşağı indirmek için */
+  background: transparent;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: color 0.2s;
+  padding: 5px;
+}
+
+.remove-btn:hover {
+  color: #d32f2f;
+}
+
+/* Yardımcı Metinler */
+.helper-text {
+  font-size: 0.75rem;
+  color: #999;
+  margin-bottom: 1rem;
 }
 
 .error {
-  color: red;
-  margin-top: 1rem;
+  color: #d32f2f;
+  background: #fff5f5;
+  padding: 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
   text-align: center;
 }
 
-.helper-text {
-  font-size: 12px;
-  color: #666;
-  margin-top: 4px;
-  font-family: sans-serif;
+/* Disabled Durumu */
+.disabled-btn, :disabled {
+  background: #f5f5f5 !important;
+  color: #bbb !important;
+  border-color: #eee !important;
+  cursor: not-allowed;
 }
 
-.disabled-btn {
-  background-color: #e8f5e9 !important; 
-  color: #a5d6a7 !important;
-  cursor: not-allowed; 
+@media (max-width: 600px) {
+  .edit-recipe {
+    padding: 1.5rem;
+  }
+  .ingredient-row {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

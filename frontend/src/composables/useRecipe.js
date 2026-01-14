@@ -65,6 +65,7 @@ export function useRecipe() {
             return data;
         } catch(error) {
             error.value = error.response?.data?.message || 'Failed to submit recipe';
+            throw error
         } finally {
             isLoading.value = false;
         }
@@ -78,6 +79,7 @@ export function useRecipe() {
             return data;
         } catch(error) {
             error.value = error.response?.data?.message || 'Failed to delete recipe';
+            throw error
         } finally {
             isLoading.value = false;
         }
@@ -91,6 +93,7 @@ export function useRecipe() {
             return data;
         } catch (error) {
             error.value = error.response?.data?.message || 'Failed to add recipe to favs';
+            throw error
         } finally {
             isLoading.value = false
         }
@@ -104,6 +107,7 @@ export function useRecipe() {
             return data
         } catch (error) {
             error.value = error.response?.data?.message || 'Failed to remove recipe to favs';
+            throw error
         } finally {
             isLoading.value = false
         }
@@ -127,6 +131,7 @@ export function useRecipe() {
             return response
         } catch (err) {
             error.value = err.response?.data?.message || 'Failed to update the recipe ';
+            throw err
         } finally {
             isLoading.value = false
         }

@@ -17,14 +17,19 @@ export async function getRecipeById(recipe_id) {
 }
 
 export async function submitRecipe(formData) {
-    const token = localStorage.getItem('token');
-    const result = await api.post(`/recipes/submit`, formData, {
-        headers:{
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-        }
-    });
-    return result.data
+    try {
+        const token = localStorage.getItem('token');
+        const result = await api.post(`/recipes/submit`, formData, {
+            headers:{
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return result.data   
+    } catch (err) {
+        console.error(err)
+        throw err
+    }
 }
 
 export async function deleteRecipe(recipe_id) {
@@ -49,8 +54,13 @@ export async function getUserFavorites() {
 }
 
 export async function updateRecipe(recipe_id,data) {
-    const result = await api.put(`/recipes/update/${recipe_id}`, data)
-    return result
+    try {
+        const result = await api.put(`/recipes/update/${recipe_id}`, data)
+        return result   
+    } catch (err) {
+        console.error(err)
+        throw err
+    }
 }
 
 export async function updateRecipeImage(recipe_id,data) {

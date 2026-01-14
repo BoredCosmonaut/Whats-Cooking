@@ -13,29 +13,30 @@ const recipeValidations = {
         body('title')
             .trim()
             .notEmpty().withMessage('Title is required')
-            .isLength({ max: 100 }).withMessage('Title too long')
-            .matches(/^[a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s\-\,\.\!\'\?]+$/)
-            .withMessage('Title contains invalid characters '),
+            .isLength({min:5, max: 25 }).withMessage('Title too long')
+            .matches(/^[a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s\.,!?'?\-]+$/)
+            .withMessage('Title contains invalid characters'),
 
         body('description')
             .trim()
             .notEmpty().withMessage('Description is required')
-            .isLength({ max: 100 }).withMessage('Description should be concise')
-            .matches(/^[a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s\-\,\.\!\'\?\(\)\:\;]+$/)
+            .isLength({ max: 500 }).withMessage('Description too long')
+            .matches(/^[a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s\.,!?'?()\-:;]+$/)
             .withMessage('Description contains invalid characters'),
 
         body('category')
             .trim()
             .notEmpty().withMessage('Please select a category')
-            .isLength({ min: 7, max: 25 }).withMessage('Category name length issue'),
-
+            .isLength({ min: 3, max: 25 }).withMessage('Category name length issue')
+            .matches(/^[a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s\-]+$/)
+            .withMessage('Category contains invalid characters'),
         body('cooking_time')
             .trim()
             .notEmpty().withMessage('Cooking time is required')
             .isInt().withMessage('Cooking time must be a number'),
         body('difficulty')
             .isIn(['Easy', 'Medium', 'Hard']).withMessage('Invalid difficulty level'),
-body('ingredients').custom((value) => {
+        body('ingredients').custom((value) => {
             const parsed = typeof value === 'string' ? JSON.parse(value) : value;
             if (!Array.isArray(parsed) || parsed.length === 0) throw new Error('Add at least one ingredient');
             
@@ -74,6 +75,7 @@ body('ingredients').custom((value) => {
         query('q').optional().trim().escape()
     ]
 };
+
 
 router.post('/submit', authMiddleware, authorizeRoles('User','Admin'),dynamicUpload.upload.single('image'),rateLimiter.generalRateLimiter,recipeValidations.saveRecipe, recipeController.createRecipe);
 
