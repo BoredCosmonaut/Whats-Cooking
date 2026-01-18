@@ -42,10 +42,10 @@ const addStep = () => steps.value.push('');
 const removeStep = (index) => steps.value.splice(index, 1);
 
 async function handleSubmit() {
-  const filteredIngredients = ingredients.value.filter(ing => ing.name.trim() !== '');
-  const filteredSteps = steps.value.filter(step => step.trim() !== '');
+  const filteredIngredients = ingredients.value.filter(i => i.name.trim());
+  const filteredSteps = steps.value.filter(s => s.trim());
 
-  if (filteredIngredients.length === 0 || filteredSteps.length === 0) {
+  if (!filteredIngredients.length || !filteredSteps.length) {
     return toast.warning('Please add at least one step and ingredient');
   }
 
@@ -56,17 +56,18 @@ async function handleSubmit() {
   formData.append('cooking_time', cooking_time.value);
   formData.append('difficulty', difficulty.value);
   formData.append('ingredients', JSON.stringify(filteredIngredients));
-  formData.append('steps', JSON.stringify(filteredSteps));
+
+  filteredSteps.forEach((step, i) => {
+    formData.append(`steps[${i}]`, step);
+  });
+
   if (image.value) formData.append('image', image.value);
 
-  try {
-    const res = await submitRecipe(formData);
-    toast.success(res.message || 'Recipe submitted! ');
-    router.push(`/recipe/${res.recipe.recipe_id}`);
-  } catch (err) {
-    toast.error(err.response?.data?.message || 'Submission failed');
-  }
+  const res = await submitRecipe(formData);
+  toast.success('Recipe submitted!');
+  router.push(`/recipe/${res.recipe.recipe_id}`);
 }
+
 </script>
 
 <template>
@@ -76,7 +77,7 @@ async function handleSubmit() {
     <form class="form" @submit.prevent="handleSubmit">
       <section class="basic-info">
         <label>Title</label>
-        <input v-model="title" placeholder="What's the name of your dish?" type="text" required maxlength="100">
+        <input v-model="title" placeholder="What's the name of your dish?" type="text" required maxlength="25">
 
         <label>Short Description</label>
         <textarea v-model="description" placeholder="A little bit about this recipe..." required maxlength="250"></textarea>

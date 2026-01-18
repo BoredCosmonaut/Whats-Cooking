@@ -13,7 +13,7 @@ const recipeValidations = {
         body('title')
             .trim()
             .notEmpty().withMessage('Title is required')
-            .isLength({min:5, max: 25 }).withMessage('Title too long')
+            .isLength({min:5, max: 25 }).withMessage('Title must be 5-25 chars long')
             .matches(/^[a-zA-Z0-9ğüşıöçĞÜŞİÖÇ\s\.,!?'?\-]+$/)
             .withMessage('Title contains invalid characters'),
 
